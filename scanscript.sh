@@ -1,31 +1,39 @@
 sudo rm /tmp/nmapTempFile /tmp/nmapOpenPorts
+
+# Make directory for each host scanned
 function makeScanDir(){
 	mkdir $1 2> /dev/null
 	echo "$1/$2-$3"
 }
 
+# FTP scan
 function ftpScan(){
 	ip=$1;port=$2
 	nmapftpdir=$(makeScanDir $ip $port "ftpscan")
 	nmap --script="ftp*" -p $port $ip > $nmapftpdir
 }
+
+# HTTP/SSL scan
 function httpScan(){
 	ip=$1;port=$2
 	dirbdir=$(makeScanDir $ip $port "dirb")
 	nmaphttpdir=$(makeScanDir $ip $port "nmap-http")
 	niktodir=$(makeScanDir $ip $port "nikto")
 	sslscandir=$(makeScanDir $ip $port "sslscan")
+	wpscandir=$(makeScanDir $ip $port "wpscan")
 
 	# check if http or httos by whether it ends with port 80 or 443
 	protocol="http://";if [[ "$port" == *"443" ]]; then protocol="https://"; fi
 
 	# Proceed with scans
-	gobuster dir --wildcard -x "php,html" -w /usr/share/dirb/wordlists/big.txt --url "$protocol"$ip:$port > $dirbdir
+	gobuster dir -x "php,html,jsp,jpg" -w /usr/share/dirb/wordlists/big.txt --wildcard -u "$protocol"$ip:$port > $dirbdir
 	nmap $ip -p $port --script="http*" > $nmaphttpdir
 	nikto -h "$protocol""$ip":"$port" > $niktodir
-	sslscan "$protocol""$ip":"$port" > $sslscandir
+	sslscan "$ip":"$port" > $sslscandir
+	yes|wpscan --url "$protocol""$ip":"$port" > $wpscandir
 }
 
+# Decide what scan to run, depending on origional Nmap results
 function portcheck(){
 	ip=$1
 	port=$2
@@ -37,22 +45,17 @@ function portcheck(){
 	fi
 }
 
-function formatUrl(){
-	tmp1=$(printf $1|sed 's/https:\/\///g')
-	tmp2=$(printf $tmp1|sed 's/http:\/\///g')
-	tmp1=$(printf $tmp2|sed 's/\///g')
-	tmp2=$(printf $tmp1|sed 's/www\.//g')
-	echo $tmp2
-}
 
-while read y; do
-	# Format if its a URL. Will not work with http, https or www. or with a /
-	x=$(formatUrl $y)
-	nmap -p- -Pn -sV $x -oG /tmp/nmapTempFile
+# Read the file containing hosts
+while read x; do
+	# Scan host, All ports
+	nmap -Pn -sV $x -p- -oG /tmp/nmapTempFile
 	cat /tmp/nmapTempFile | grep -i open | sed 's/Ports: /\n/g'|tr "," "\n"| tr -d " "|grep -E "^[0-9]" | tr "\/" " " | awk '{print $1" "$4}' > /tmp/nmapOpenPorts
 	cat /tmp/nmapOpenPorts >> /tmp/xxx
 	clear; echo "The format should be: Port, Protocol. Does this look correct?"
+	head /tmp/nmapOpenPorts
 
+	# Iterate through all ports discovered
 	while read p; do
 		portcheck $x $p
 	done < /tmp/nmapOpenPorts
