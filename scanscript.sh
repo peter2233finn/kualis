@@ -48,10 +48,18 @@ function portcheck(){
 
 # Read the file containing hosts
 while read x; do
+	# two tempoary files for nmap results.
+	tmpFile=tmp1
+	openports=tmp2
+	tmp1="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 25)"
+	tmp2="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 25)"
+
 	# Scan host, All ports
-	nmap -Pn -sV $x -p- -oG /tmp/nmapTempFile
-	cat /tmp/nmapTempFile | grep -i open | sed 's/Ports: /\n/g'|tr "," "\n"| tr -d " "|grep -E "^[0-9]" | tr "\/" " " | awk '{print $1" "$4}' > /tmp/nmapOpenPorts
-	cat /tmp/nmapOpenPorts >> /tmp/xxx
+	nmap -Pn -sV $x -p- -oG $tmp1
+	cat $tmp1 | grep -i open | sed 's/Ports: /\n/g'|tr "," "\n"| tr -d " "|grep -E "^[0-9]" | tr "\/" " " | awk '{print $1" "$4}' > $tmp2
+
+	# TESTING:
+	cat $tmp2 >> /tmp/xxx
 	clear; echo "The format should be: Port, Protocol. Does this look correct?"
 	head /tmp/nmapOpenPorts
 
@@ -60,5 +68,5 @@ while read x; do
 		portcheck $x $p
 	done < /tmp/nmapOpenPorts
 
-	rm /tmp/nmapTempFile /tmp/nmapOpenPorts
+	rm $tmp1 $tmp2
 done < "$*"
