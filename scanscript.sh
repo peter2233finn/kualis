@@ -1,36 +1,41 @@
-sudo rm /tmp/nmapTempFile /tmp/nmapOpenPorts
-
 # Make directory for each host scanned
 function makeScanDir(){
-	mkdir $1 2> /dev/null
+	[ -d $1 ] || (mkdir $1; echo Making directory for: $1)
+#	mkdir $1
 	echo "$1/$2-$3"
 }
+
+function execute(){
+	ip=$(echo "$*"|awk '{print $1}')
+	port=$(echo "$*"|awk '{print $2}')
+	cmd=$(echo "$*"|awk '{print $3}')
+	directory="$(makeScanDir $ip $port $cmd)"
+	cmd="$(printf "$*"|awk '{print $4" "$5" "$6" "$7" "$8" "$9" "$10" "$11" "$12" "$13" "$14" "$15}') > $directory"
+	sp="\n===================================================================\n"
+	printf "$sp executing: $cmd $sp Address: $ip Port: $port with command: $cmd $sp"|sed 's/>/ into directory: /g'|sed 's/  / /g'
+	eval "$cmd"
+}
+
 
 # FTP scan
 function ftpScan(){
 	ip=$1;port=$2
-	nmapftpdir=$(makeScanDir $ip $port "ftpscan")
-	nmap --script="ftp*" -p $port $ip > $nmapftpdir
+	execute "$ip $port nmap nmap --script=\"ftp*\" -p $port $ip"
 }
 
 # HTTP/SSL scan
 function httpScan(){
 	ip=$1;port=$2
-	dirbdir=$(makeScanDir $ip $port "dirb")
-	nmaphttpdir=$(makeScanDir $ip $port "nmap-http")
-	niktodir=$(makeScanDir $ip $port "nikto")
-	sslscandir=$(makeScanDir $ip $port "sslscan")
-	wpscandir=$(makeScanDir $ip $port "wpscan")
-
+	echo "Starting http scan on: $ip and port $port"
 	# check if http or httos by whether it ends with port 80 or 443
 	protocol="http://";if [[ "$port" == *"443" ]]; then protocol="https://"; fi
 
 	# Proceed with scans
-	gobuster dir -x "php,html,jsp,jpg" -w /usr/share/dirb/wordlists/big.txt --wildcard -u "$protocol"$ip:$port > $dirbdir
-	nmap $ip -p $port --script="http*" > $nmaphttpdir
-	nikto -h "$protocol""$ip":"$port" > $niktodir
-	sslscan "$ip":"$port" > $sslscandir
-	yes|wpscan --url "$protocol""$ip":"$port" > $wpscandir
+	execute "$ip $port nikto nikto -h $protocol$ip:$port -maxtime 30m"
+	execute "$ip $port nmap-http-scripts nmap $ip -p $port --script='http*'"
+	execute "$ip $port gobuster gobuster dir -x 'php,html,jsp,jpg' -w /usr/share/dirb/wordlists/big.txt --wildcard -u $protocol$ip:$port"
+	execute "$ip $port sslscan sslscan $ip:$port"
+	execute "$ip $port wpscan yes|wpscan --url $protocol$ip:$port"
 }
 
 # Decide what scan to run, depending on origional Nmap results
@@ -56,17 +61,11 @@ while read x; do
 
 	# Scan host, All ports
 	nmap -Pn -sV $x -p- -oG $tmp1
-	cat $tmp1 | grep -i open | sed 's/Ports: /\n/g'|tr "," "\n"| tr -d " "|grep -E "^[0-9]" | tr "\/" " " | awk '{print $1" "$4}' > $tmp2
-
-	# TESTING:
-	cat $tmp2 >> /tmp/xxx
-	clear; echo "The format should be: Port, Protocol. Does this look correct?"
-	head /tmp/nmapOpenPorts
+	cat $tmp1 | egrep -i "filtered|open" | sed 's/Ports: /\n/g'|tr "," "\n"| tr -d " "|grep -E "^[0-9]" | tr "\/" " " | awk '{print $1" "$4}' > $tmp2
 
 	# Iterate through all ports discovered
 	while read p; do
 		portcheck $x $p
-	done < /tmp/nmapOpenPorts
+	done < $tmp2
 
-	rm $tmp1 $tmp2
 done < "$*"
