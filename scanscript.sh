@@ -1,4 +1,6 @@
 # Make directory for each host scanned
+# Usage: ./scanscript.sh file
+# The file should contain a list of IP addresses.
 function makeScanDir(){
 	[ -d $1 ] || (mkdir $1; echo Making directory for: $1)
 #	mkdir $1
