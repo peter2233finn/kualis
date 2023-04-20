@@ -1,73 +1,39 @@
-# Make directory for each host scanned
-# Usage: ./scanscript.sh file
-# The file should contain a list of IP addresses.
-function makeScanDir(){
-	[ -d $1 ] || (mkdir $1; echo Making directory for: $1)
-#	mkdir $1
-	echo "$1/$2-$3"
-}
+# to scan results copied from a Qualys csv file
+# enter targets in the order: ip port protocol (Seperated by spaces. Should be copied from csv file)
 
-function execute(){
-	ip=$(echo "$*"|awk '{print $1}')
-	port=$(echo "$*"|awk '{print $2}')
-	cmd=$(echo "$*"|awk '{print $3}')
-	directory="$(makeScanDir $ip $port $cmd)"
-	cmd="$(printf "$*"|awk '{print $4" "$5" "$6" "$7" "$8" "$9" "$10" "$11" "$12" "$13" "$14" "$15}') > $directory"
-	sp="\n===================================================================\n"
-	printf "$sp executing: $cmd $sp Address: $ip Port: $port with command: $cmd $sp"|sed 's/>/ into directory: /g'|sed 's/  / /g'
-	eval "$cmd"
-}
+# targets is the file which contains the data in the format: ip port protocol
+target="targets.txt"
+folder="scan-results"
 
 
-# FTP scan
-function ftpScan(){
-	ip=$1;port=$2
-	execute "$ip $port nmap nmap --script=\"ftp*\" -p $port $ip"
-}
+if [ "$(id -u)" -ne 0 ]; then
+        echo 'This script must be run by root' >&2
+        exit 1
+fi
+mkdir "$folder"
 
-# HTTP/SSL scan
-function httpScan(){
-	ip=$1;port=$2
-	echo "Starting http scan on: $ip and port $port"
-	# check if http or httos by whether it ends with port 80 or 443
-	protocol="http://";if [[ "$port" == *"443" ]]; then protocol="https://"; fi
+cat "$target" | sort | uniq | while read line; do
+        ip=$(echo "$line" |awk '{print $1}')
+        port=$(echo "$line" |awk '{print $2}')
+        proto=$(echo "$line" |awk '{print $3}')
 
-	# Proceed with scans
-	execute "$ip $port nikto nikto -h $protocol$ip:$port -maxtime 30m"
-	execute "$ip $port nmap-http-scripts nmap $ip -p $port --script='http*'"
-	execute "$ip $port gobuster gobuster dir -x 'php,html,jsp,jpg' -w /usr/share/dirb/wordlists/big.txt --wildcard -u $protocol$ip:$port"
-	execute "$ip $port sslscan sslscan $ip:$port"
-	execute "$ip $port wpscan yes|wpscan --url $protocol$ip:$port"
-}
+        # testing
+        #echo "recieved: ip: $ip port: $port protocol:$proto";
 
-# Decide what scan to run, depending on origional Nmap results
-function portcheck(){
-	ip=$1
-	port=$2
-	protocol=$3
-	echo "Checking $ip on port $port""..."
-	if [[ "$protocol" == *"http"* ]]; then echo "$ip contains http on $port. Running http scripts";httpScan $ip $port
-	elif [[ "$protocol" == *"ssl"* ]]; then echo "$ip contains ssl on port $port. Running http scripts";httpScan $ip $port
+        if [ ! -z $proto ]; then
+                folderPath="${folder}/${ip}-${port}"
 
-	fi
-}
+                if [ ! -f "$folderPath" ]; then
+                        if [ "$proto" = "tcp" ]; then
+                        echo "TCP scanning: ip: $ip port: $port protocol:$proto";
+                                echo "TCP scanning: $ip"
+                                nmap -sV -sC $ip -p $port >> "${folderPath}"
 
-
-# Read the file containing hosts
-while read x; do
-	# two tempoary files for nmap results.
-	tmpFile=tmp1
-	openports=tmp2
-	tmp1="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 25)"
-	tmp2="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 25)"
-
-	# Scan host, All ports
-	nmap -Pn -sV $x -p- -oG $tmp1
-	cat $tmp1 | egrep -i "filtered|open" | sed 's/Ports: /\n/g'|tr "," "\n"| tr -d " "|grep -E "^[0-9]" | tr "\/" " " | awk '{print $1" "$4}' > $tmp2
-
-	# Iterate through all ports discovered
-	while read p; do
-		portcheck $x $p
-	done < $tmp2
-
-done < "$*"
+                        elif [ "$proto" = "udp" ]; then
+                                echo "UDP scanning: ip: $ip port: $port protocol:$proto";
+                                nmap -sV -sC -sU $ip -p $port >> "${folderPath}"
+                        fi
+                fi
+        fi
+done
+chmod 777 "${folder}/*"
