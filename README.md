@@ -17,8 +17,8 @@ the tool will run tools such as nikto, sslscan, gobuster ect. The tools that wil
 <br>The first part of the file can be created using a scanner such as Nmap or Masscan. 
 <br>**masscan --top-ports=1000 -oG ScanResults.txt 192.168.0.0/24**
 <br><br>Then formatting it to the input file by running the command:
-<br>**grep open ScanResults.txt|tr "/" " "|awk '{print $4" "$7" "$9}'** > scan-results.txt
+<br>**grep open ScanResults.txt|tr "/" " "|awk '{print $4" "$7" "$9}'** > scanResults.txt
 <br><br>This can then be run by the scanner
-<br>**./scan.sh -o outputFolder -f scan-results.txt -c custom-scripts**
+<br>**./scan.sh -o outputFolder -f scanResults.txt -c custom-scripts**
 <br><br>
 Feel free to commit changes and additions. Im not a programmer by day, so please excuse the shoddy code.
