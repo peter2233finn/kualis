@@ -9,15 +9,16 @@ if [ "$(id -u)" -ne 0 ]; then
         exit 1
 fi
 
-while getopts o:f: opts; do
+while getopts o:f:c: opts; do
         case ${opts} in
                 f) target="${OPTARG}" ;;
                 o) folder="${OPTARG}" ;;
+                c) customscripts="${OPTARG}" ;;
         esac
 done
 
-if [ -z "$target"  ] || [ -z "$folder" ]; then
-        echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol)"
+if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ]; then
+	echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file)"
         exit
 fi
 
@@ -32,9 +33,9 @@ fscan(){
 
         service=$(cat "${localFolder}/nmap"|grep -A 1 SERVICE|tail -n 1|awk '{print $3}'|tr "\t" " "|tr -d "?")
         printf "\nThe service was detected as: ${service}.\n\nwill run the following commands and save them in the files.\n"
-        grep "^${service}"":" ${config} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" | awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}'
+        grep "^${service}"":" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" | awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}'
 
-        grep "$service" custom-scripts | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
+        grep "$service" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
 
         while read l; do
                 fileName=$(echo ${l} | awk '{print $2}')
@@ -43,7 +44,7 @@ fscan(){
                 sh "$tmpFileCommand"
         done < "$tmpFile"
 
-        rm $tmpFile $tmpFileCommand
+        rm $tmpFile $tmpFileCommand 2> /dev/null
 
 }
 
