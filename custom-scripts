@@ -1,23 +1,31 @@
-http:           	gobuster-directory      timeout 3600 gobuster dir -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt
-http:           	curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1
-ssl/https:     		sslscan                 sslscan XXIPXX:XXPORTXX
-ssl/https:	     	nikto                   timeout 3600 nikto -host https://XXIPXX:XXPORTXX
-ssl/https:	     	gobuster-directory      gobuster dir -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt
-ssl/http:       	curl-to-root            curl -v https://XXIPXX:XXPORTXX 2>&1
-isakmp?:        	ike-scan                ike-scan XXIPXX --dport XXPORTXX
-smtp:           	nmap-smtp-scripts       nmap XXIPXX -p XXPORTXX --script="*smtp*" -Pn
-smtp:           	smtp-user-enum          smtp-user-enum -t XXIPXX -p XXPORTXX -U /usr/share/wordlists/common-snmp-community-strings.txt
-smtp:			SMTP-Relay-test		timeout 60 sendmail -t testhfei884@yopmail.com -f test@test.com -s XXIPXX -u "Testing SMTP Relay"
-ftp:			ftp-nmap-scripts        nmap -sV -sC -Pn XXIPXX -p XXPORTXX --script="*ftp*"
-omginitialrefs: 	omg-nmap-scan		nmap -sV -sC XXIPXX -p XXPORTXX -Pn
-telnet:			nmap-script-telnet	nmap XXIPXX -p XXPORTXX --script="*telnet*" -Pn
-fw1-secureremote:	Banner-grabbed 		printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX
-snmp:			snmp-bulk-walk-v2c	timeout 20 snmpbulkwalk -c public -v2c XXIPXX .
-snmp:			snmp-bulk-walk-v1	timeout 20 snmpbulkwalk -c public -v1 XXIPXX .
-ms-sql-s:		ms-sql-nmap-script	nmap XXIPXX -p XXPORTXX -Pn --script="*ms-sql* and not *brute*"
-unknown:		unknown-nmap		nmap XXIPXX -p XXPORTXX -Pn -sV -sC -oA enum
-ldap:			ldapsearch		ldapsearch -H ldaps://XXIPXX:XXPORTXX/ -x -s base -b '' "(objectClass=*)" "*" +
-ldap:			ldap-nmap-script	nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn
-msrpc:			rpcdump			timeout 300 rpcdump.py XXIPXX -p XXPORTXX
-microsoft-ds:		SMB-scripts-nmap	nmap -sV -sC XXIPXX -p XXPORTXX --script="smb*" -Pn
-microsoft-ds:		nbtscan			timeout 60 nbtscan -r XXIPXX
+ftp:                    ftp-nmap-scripts        nmap -sV -sC -Pn XXIPXX -p XXPORTXX --script="*ftp*"
+fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX
+http-alt:               curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1
+http-alt:               gobuster-directory      timeout 3600 gobuster dir -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt 2>&1
+http:                   curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1
+http:                   gobuster-directory      timeout 3600 gobuster dir -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt 2>&1
+isakmp?:                ike-scan                ike-scan XXIPXX --dport XXPORTXX
+ldap:                   ldap-nmap-script        nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn
+ldap:                   ldapsearch              ldapsearch -H ldaps://XXIPXX:XXPORTXX/ -x -s base -b '' "(objectClass=*)" "*" +
+microsoft-ds:           SMB-scripts-nmap        nmap -sV -sC XXIPXX -p XXPORTXX --script="smb*" -Pn
+microsoft-ds:           nbtscan                 timeout 60 nbtscan -r XXIPXX
+ms-sql-s:               ms-sql-nmap-script      nmap XXIPXX -p XXPORTXX -Pn --script="*ms-sql* and not *brute*"
+msrpc:                  rpcdump-to-port         timeout 300 rpcdump.py XXIPXX -p XXPORTXX
+msrpc:                  rpcdump-without-port    timeout 300 rpcdump.py XXIPXX
+ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXIPXX -p XXPORTXX -Pn
+omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn
+smtp:                   SMTP-Relay-test         timeout 60 sendmail -t testhfei884@yopmail.com -f test@test.com -s XXIPXX -u "Testing SMTP Relay"
+smtp:                   nmap-smtp-scripts       nmap XXIPXX -p XXPORTXX --script="*smtp*" -Pn
+smtp:                   smtp-user-enum          smtp-user-enum -t XXIPXX -p XXPORTXX -U /usr/share/wordlists/common-snmp-community-strings.txt
+snmp:                   snmp-bulk-walk          snmpbulkwalk -c public -v2c XXIPXX .
+snmp:                   snmp-bulk-walk-v1       timeout 20 snmpbulkwalk -c public -v1 XXIPXX .
+snmp:                   snmp-bulk-walk-v2c      timeout 20 snmpbulkwalk -c public -v2c XXIPXX .
+snmp:                   snmp-nmap-scripts       nmap XXIPXX -p XXPORTXX --script="snmp*"
+ssh:                    ssh-audit               ssh-audit XXIPXX -p XXPORTXX
+ssh:                    ssh-nmap-scripts        nmap XXIPXX -p XXPORTXX --script="ssh*"
+ssl/http:               curl-to-root            curl -v https://XXIPXX:XXPORTXX 2>&1
+ssl/https:              gobuster-directory      gobuster dir -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt
+ssl/https:              nikto                   timeout 3600 nikto -host https://XXIPXX:XXPORTXX
+ssl/https:              sslscan                 sslscan XXIPXX:XXPORTXX
+telnet:                 nmap-script-telnet      nmap XXIPXX -p XXPORTXX --script="*telnet*" -Pn
+unknown:                unknown-nmap            nmap XXIPXX -p XXPORTXX -Pn -sV -sC -oA enum
