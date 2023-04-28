@@ -30,7 +30,7 @@ fscan(){
         tmpFileCommand="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
         localFolder="${1}"
 
-        service=$(cat "${localFolder}/nmap"|grep -A 1 SERVICE|tail -n 1|awk '{print $3}'|tr "\t" " ")
+        service=$(cat "${localFolder}/nmap"|grep -A 1 SERVICE|tail -n 1|awk '{print $3}'|tr "\t" " "|tr -d "?")
         printf "\nThe service was detected as: ${service}.\n\nwill run the following commands and save them in the files.\n"
         grep "^${service}"":" ${config} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" | awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}'
 
