@@ -62,11 +62,11 @@ cat "$target" | sort | uniq | while read line; do
                 if [ ! -f "${folderPath}/nmap" ]; then
                         if [ "$proto" = "tcp" ]; then
                         echo "Nmap tcp scan for ip: $ip port: $port protocol: $proto";
-                                nmap -sV -sC $ip -p $port >> "${folderPath}/nmap"
+                                nmap -Pn -sV -sC $ip -p $port >> "${folderPath}/nmap"
 
                         elif [ "$proto" = "udp" ]; then
                                 echo "nmap udp scan for ip: $ip port: $port protocol: $proto";
-                                nmap -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
+                                nmap -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
                         fi
                 fi
                 fscan ${folderPath} $ip $port
