@@ -1,6 +1,6 @@
 ftp:                    ftp-nmap-scripts        nmap -sV -sC -Pn XXIPXX -p XXPORTXX --script="*ftp*" > XXFILEXX
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX
-http-alt:               curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 XXFILEXX
+http-alt:               curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
 http-alt:               gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
 http:                   curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 XXFILEXX
 http:                   gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
