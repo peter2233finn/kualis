@@ -15,6 +15,7 @@ if [ -z ${opt+x} ]; then
         echo "1. Print in format: ip port/protocol"
         echo "2. Print in format: ip port protocol"
         echo "3. Check which targets have not been scanned."
+        echo "4. Iterate through the results in the same order as option 1 and 2."
         read opt
 fi
 
@@ -36,4 +37,19 @@ if [ "$opt" = "3" ]; then
         echo "Done."
 
 
-elif [ "$opt" = "4" ]; then echo "NOT IMPLEMENTED"; fi
+elif [ "$opt" = "4" ]; then
+        [ -z ${folder+x} ] && printf "usage: sort.sh -f (target file) -r (folder with results). \nTo use option 3 and 4, you must have the -r arguement.\n" && exit
+        [ ! -d "${folder}" ] && printf "The results folder you selected in -r does not exist\n" && exit
+
+        cat "${target}"|grep -E -i "tcp|udp"|sort|uniq|awk '{print $1"-"$2}' | while read x; do
+                targetFile="${folder}/""$x"
+
+                if [ -f "${targetFile}/nmap" ]; then
+                        echo "Iterating through: ${targetFile}"
+                        read null
+                        find "${targetFile}" | while read y; do
+                                less "$y"
+                        done
+                fi
+        done
+fi
