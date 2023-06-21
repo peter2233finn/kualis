@@ -1,9 +1,9 @@
 ftp:                    ftp-nmap-scripts        nmap -sV -sC -Pn XXIPXX -p XXPORTXX --script="*ftp*" > XXFILEXX
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX
 http-alt:               curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 XXFILEXX
-http-alt:               gobuster-directory      timeout 3600 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
+http-alt:               gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
 http:                   curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 XXFILEXX
-http:                   gobuster-directory      timeout 3600 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
+http:                   gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
 isakmp?:                ike-scan                ike-scan XXIPXX --dport XXPORTXX -N -A 2>&1 > XXFILEXX
 ldap:                   ldap-nmap-script        nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn > XXFILEXX
 ldap:                   ldapsearch              ldapsearch -H ldaps://XXIPXX:XXPORTXX/ -x -s base -b '' "(objectClass=*)" "*" + > XXFILEXX
@@ -14,7 +14,7 @@ msrpc:                  rpcdump-to-port         timeout 300 rpcdump.py XXIPXX -p
 msrpc:                  rpcdump-without-port    timeout 300 rpcdump.py XXIPXX > XXFILEXX
 ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn  > XXFILEXX
-smtp:                   SMTP-Relay-test         timeout 60 sendmail -t testhfei884@yopmail.com -f test@test.com -s XXIPXX -u "Testing SMTP Relay" 2>&1 > XXFILEXX
+smtp:                   SMTP-Relay-test         timeout 60 sendmail -t test@test.com -f test@test.com -s XXIPXX -u "Testing SMTP Relay" 2>&1 > XXFILEXX
 smtp:                   nmap-smtp-scripts       nmap XXIPXX -p XXPORTXX --script="*smtp*" -Pn  > XXFILEXX
 smtp:                   smtp-user-enum          smtp-user-enum -t XXIPXX -p XXPORTXX -U /usr/share/wordlists/common-snmp-community-strings.txt  > XXFILEXX
 snmp:                   snmp-bulk-walk          snmpbulkwalk -c public -v2c XXIPXX .  > XXFILEXX
@@ -24,8 +24,8 @@ snmp:                   snmp-nmap-scripts       nmap XXIPXX -p XXPORTXX --script
 ssh:                    ssh-audit               ssh-audit XXIPXX -p XXPORTXX  > XXFILEXX
 ssh:                    ssh-nmap-scripts        nmap XXIPXX -p XXPORTXX --script="ssh*"  > XXFILEXX
 ssl/http:               curl-to-root            curl -v https://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
-ssl/https:              gobuster-directory      timeout 3600 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
-ssl/https:              nikto                   timeout 3600 nikto -host https://XXIPXX:XXPORTXX > XXFILEXX
+ssl/https:              gobuster-directory      timeout 900 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
+ssl/https:              nikto                   timeout 900 nikto -host https://XXIPXX:XXPORTXX > XXFILEXX
 ssl/https:              sslscan                 sslscan XXIPXX:XXPORTXX > XXFILEXX
 telnet:                 nmap-script-telnet      nmap XXIPXX -p XXPORTXX -Pn --script="*telnet*"  > XXFILEXX
 mysql:                  nmap-mysql-scripts      nmap XXIPXX -p XXPORTXX -Pn --script="mysql*" > XXFILEXX
