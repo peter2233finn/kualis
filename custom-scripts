@@ -20,9 +20,9 @@ smtp:                   smtp-user-enum          smtp-user-enum -t XXIPXX -p XXPO
 snmp:                   snmp-bulk-walk          snmpbulkwalk -c public -v2c XXIPXX .  > XXFILEXX
 snmp:                   snmp-bulk-walk-v1       timeout 20 snmpbulkwalk -c public -v1 XXIPXX .  > XXFILEXX
 snmp:                   snmp-bulk-walk-v2c      timeout 20 snmpbulkwalk -c public -v2c XXIPXX .  > XXFILEXX
-snmp:                   snmp-nmap-scripts       nmap XXIPXX -p XXPORTXX --script="snmp*"  > XXFILEXX
+snmp:                   snmp-nmap-scripts       nmap -Pn XXIPXX -p XXPORTXX --script="snmp*"  > XXFILEXX
 ssh:                    ssh-audit               ssh-audit XXIPXX -p XXPORTXX  > XXFILEXX
-ssh:                    ssh-nmap-scripts        nmap XXIPXX -p XXPORTXX --script="ssh*"  > XXFILEXX
+ssh:                    ssh-nmap-scripts        nmap -Pn XXIPXX -p XXPORTXX --script="ssh*"  > XXFILEXX
 ssl/http:               curl-to-root            curl -v https://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
 ssl/https:              gobuster-directory      timeout 900 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null > /dev/null
 ssl/https:              nikto                   timeout 900 nikto -host https://XXIPXX:XXPORTXX > XXFILEXX
