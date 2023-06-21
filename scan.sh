@@ -51,8 +51,8 @@ fscan(){
                 sanitizedFile="$(echo ${localFolder}/${fileName} | sed 's/\//\\\//g')"
 
                 echo "${command}" | sed "s/XXFILEXX/${sanitizedFile}/g" > $tmpFileCommand
-                sh "$tmpFileCommand"
                 cat "$tmpFileCommand"
+                sh "$tmpFileCommand"
         done < "$tmpFile"
 
         rm $tmpFile $tmpFileCommand 2> /dev/null
