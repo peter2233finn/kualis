@@ -25,8 +25,12 @@ if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ]; then
         exit
 fi
 
-
+# Ensure directory exists.
 mkdir "$folder" 2> /dev/null
+
+# fscan scans indevigual services, after they are sorted in the following code.
+# fscan function takes the following parameters:
+# fscan folderPath ip port
 fscan(){
         port="$3"
         ip="$2"
@@ -59,20 +63,26 @@ fscan(){
 
 }
 
-# Iterate through file.
+# The following code iterates through each of the services.
+# It will ensure there is ip, port, protocol.
 cat "$target" | sort | uniq | while read line; do
         ip=$(echo "$line" |awk '{print $1}')
         port=$(echo "$line" |awk '{print $2}')
         proto=$(echo "$line" |awk '{print $3}')
 
+        # Skip if the protocol is not present. 
+        # This is the final variable after ip and port, so if it is not present then skip it.  
         if [ ! -z $proto ]; then
+                # Unset and set the folder path.
                 unset folderPath
                 folderPath="${folder}/${ip}-${port}"
                 mkdir "$folderPath" 2> /dev/null
                 echo "============================================================="
 
-                # Check if it has already been scanned
+                # Check if it has already been scanned. This is done by checking if an nmap file is present.
                 if [ ! -f "${folderPath}/nmap" ]; then
+                        # Sort if tcp or udp, this will determine the nmap scan.
+                        # If not tcp or udp, then skip.
                         if [ "$proto" = "tcp" ]; then
                         echo "Nmap tcp scan for ip: $ip port: $port protocol: $proto";
                                 nmap -Pn -sV -sC $ip -p $port >> "${folderPath}/nmap"
@@ -82,10 +92,16 @@ cat "$target" | sort | uniq | while read line; do
                                 nmap -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
                         fi
                 fi
+
+                # send details to fscan function.
                 fscan ${folderPath} $ip $port
-                echo "fscan ${folderPath} $ip $port"
         fi
 done
+
+# Since it is run by root, it may not be possible to read as a normal user.
+# change permissions to 777.
 chmod -R 777 "${folder}"
+
+# print summary.
 printf "\n\n========================================================\nScan ran sucessfully. Here are the results: \n"
-ls scan-results|tr "-" " "|awk '{print $1}'|sort|uniq -c|sort|awk '{print "There are: "$1" ports scanned for the IP address: " $2}'
+ls "${folder}" |tr "-" " "|awk '{print $1}'|sort|uniq -c|sort|awk '{print "There are: "$1" ports scanned for the IP address: " $2}'
