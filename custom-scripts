@@ -24,7 +24,7 @@ snmp:                   snmp-nmap-scripts       nmap XXIPXX -p XXPORTXX --script
 ssh:                    ssh-audit               ssh-audit XXIPXX -p XXPORTXX  > XXFILEXX
 ssh:                    ssh-nmap-scripts        nmap XXIPXX -p XXPORTXX --script="ssh*"  > XXFILEXX
 ssl/http:               curl-to-root            curl -v https://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
-ssl/https:              gobuster-directory      gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
+ssl/https:              gobuster-directory      timeout 3600 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null
 ssl/https:              nikto                   timeout 3600 nikto -host https://XXIPXX:XXPORTXX > XXFILEXX
 ssl/https:              sslscan                 sslscan XXIPXX:XXPORTXX > XXFILEXX
 telnet:                 nmap-script-telnet      nmap XXIPXX -p XXPORTXX -Pn --script="*telnet*"  > XXFILEXX
