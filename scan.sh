@@ -55,6 +55,7 @@ fscan(){
                 sanitizedFile="$(echo ${localFolder}/${fileName} | sed 's/\//\\\//g')"
 
                 echo "${command}" | sed "s/XXFILEXX/${sanitizedFile}/g" > $tmpFileCommand
+                printf "Currently running: "
                 cat "$tmpFileCommand"
                 sh "$tmpFileCommand"
         done < "$tmpFile"
