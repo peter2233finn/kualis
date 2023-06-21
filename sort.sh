@@ -38,7 +38,6 @@ if [ "$opt" = "3" ]; then
 
 
 elif [ "$opt" = "4" ]; then
-debug2: channel 0: window 998582 sent adjust 49994
         [ -z ${folder+x} ] && printf "usage: sort.sh -f (target file) -r (folder with results). \nTo use option 3 and 4, you must have the -r arguement.\n" && exit
         [ ! -d "${folder}" ] && printf "The results folder you selected in -r does not exist\n" && exit
 
