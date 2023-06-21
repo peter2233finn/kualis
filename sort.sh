@@ -24,6 +24,7 @@ fi
 
 if [ "$opt" = "3" ]; then
         [ -z ${folder+x} ] && printf "usage: sort.sh -f (target file) -r (folder with results). \nTo use option 3 and 4, you must have the -r arguement.\n" && exit
+        [ ! -d "${folder}" ] && printf "The results folder you selected in -r does not exist\n" && exit
         echo "testing if each target has been scanned."
         cat "${target}"|grep -E -i "tcp|udp"|sort|uniq|awk '{print $1"-"$2}' | while read x; do
                 targetFile="${folder}/""$x"
@@ -35,4 +36,4 @@ if [ "$opt" = "3" ]; then
         echo "Done."
 
 
-elif [ "$opt" = "4" ]; then echo "NOT IMPLEMENTED YET"; fi
+elif [ "$opt" = "4" ]; then echo "NOT IMPLEMENTED"; fi
