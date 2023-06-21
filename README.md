@@ -21,4 +21,7 @@ the tool will run tools such as nikto, sslscan, gobuster ect. The tools that wil
 <br><br>This can then be run by the scanner
 <br>**./scan.sh -o outputFolder -f scanResults.txt -c custom-scripts**
 <br><br>
+When the scan is running or complete, the program sort.sh can be used to sort the results or check what has not yet been scanned. The execution format is as follows:<br>
+**./sort.sh -f scanResults.txt -r outputFolder**<br>
+
 Feel free to commit changes and additions. Im not a programmer by day, so please excuse the shoddy code.
