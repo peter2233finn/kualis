@@ -1,6 +1,6 @@
 ftp:                    ftp-nmap-scripts        nmap -sV -sC -Pn XXIPXX -p XXPORTXX --script="*ftp*" > XXFILEXX
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX
-http-alt:               curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
+http-alt:               curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 > XXFILEXX 2>&1
 http-alt:               gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null > /dev/null
 http:                   curl-to-root            curl -v http://XXIPXX:XXPORTXX 2>&1 XXFILEXX
 http:                   gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null > /dev/null
@@ -23,7 +23,7 @@ snmp:                   snmp-bulk-walk-v2c      timeout 20 snmpbulkwalk -c publi
 snmp:                   snmp-nmap-scripts       nmap -Pn XXIPXX -p XXPORTXX --script="snmp*"  > XXFILEXX
 ssh:                    ssh-audit               ssh-audit XXIPXX -p XXPORTXX  > XXFILEXX
 ssh:                    ssh-nmap-scripts        nmap -Pn XXIPXX -p XXPORTXX --script="ssh*"  > XXFILEXX
-ssl/http:               curl-to-root            curl -v https://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
+ssl/http:               curl-to-root            curl -v https://XXIPXX:XXPORTXX > XXFILEXX 2>&1
 ssl/https:              gobuster-directory      timeout 900 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null > /dev/null
 ssl/https:              nikto                   timeout 900 nikto -host https://XXIPXX:XXPORTXX > XXFILEXX
 ssl/https:              sslscan                 sslscan XXIPXX:XXPORTXX > XXFILEXX
