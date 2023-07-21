@@ -80,7 +80,7 @@ cat "$target" | sort | uniq | while read line; do
                 mkdir "$folderPath" 2> /dev/null
                 echo "============================================================="
                 # Dig to check any DNS information.
-                dig -x $ip > "${folderPath}/dns-dig 2>&1
+                dig -x $ip > "${folderPath}/dns-dig" 2>&1
                 # Check if it has already been scanned. This is done by checking if an nmap file is present.
                 if [ ! -f "${folderPath}/nmap" ]; then
                         # Sort if tcp or udp, this will determine the nmap scan.
