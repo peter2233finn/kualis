@@ -31,5 +31,5 @@ telnet:                 nmap-script-telnet      nmap XXIPXX -p XXPORTXX -Pn --sc
 mysql:                  nmap-mysql-scripts      nmap XXIPXX -p XXPORTXX -Pn --script="mysql*" > XXFILEXX
 mysql:                  hydra-mysql             hydra -L /usr/share/wordlists/usernames.txt -P /usr/share/wordlists/rockyou.txt XXIPXX mysql -I -s XXPORTXX -o XXFILEXX
 unknown:                unknown-nmap            nmap XXIPXX -p XXPORTXX -Pn -sV -sC -oA enum > XXFILEXX
-unknown:                unknown-curl-http       http://curl XXIPXX:XXPORTXX 2>&1 > XXFILEXX
-unknown:                unknown-curl-https      https://curl XXIPXX:XXPORTXX 2>&1 > XXFILEXX
+unknown:                unknown-curl-http       curl http://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
+unknown:                unknown-curl-https      curl https://XXIPXX:XXPORTXX 2>&1 > XXFILEXX
