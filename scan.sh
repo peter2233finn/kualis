@@ -70,19 +70,21 @@ cat "$target" | sort | uniq | while read line; do
         ip=$(echo "$line" |awk '{print $1}')
         port=$(echo "$line" |awk '{print $2}')
         proto=$(echo "$line" |awk '{print $3}')
+        
+	folderPath="${folder}/${ip}-${port}"
 
-        # Skip if the protocol is not present. 
-        # This is the final variable after ip and port, so if it is not present then skip it.  
-        if [ ! -z $proto ]; then
-                # Unset and set the folder path.
-                unset folderPath
-                folderPath="${folder}/${ip}-${port}"
-                mkdir "$folderPath" 2> /dev/null
-                echo "============================================================="
-                # Dig to check any DNS information.
-                dig -x $ip > "${folderPath}/dns-dig" 2>&1
-                # Check if it has already been scanned. This is done by checking if an nmap file is present.
-                if [ ! -f "${folderPath}/nmap" ]; then
+        # Check if it has already been scanned. This is done by checking if an nmap file is present.
+	if [ ! -f "${folderPath}/nmap" ]; then
+		# Unset and set the folder path.
+        	unset folderPath
+        	mkdir "$folderPath" 2> /dev/null
+		echo "============================================================="
+		echo "Target: $ip on port $port with $proto"
+        	# Dig to check any DNS information.
+        	dig -x $ip > "${folderPath}/dns-dig" 2>&1
+        	# Skip if the protocol is not present. 
+        	# This is the final variable after ip and port, so if it is not present then skip it.  
+        	if [ ! -z $proto ]; then
                         # Sort if tcp or udp, this will determine the nmap scan.
                         # If not tcp or udp, then skip.
                         if [ "$proto" = "tcp" ]; then
@@ -93,11 +95,12 @@ cat "$target" | sort | uniq | while read line; do
                                 echo "nmap udp scan for ip: $ip port: $port protocol: $proto";
                                 nmap -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
                         fi
-                fi
-
-                # send details to fscan function.
-                fscan ${folderPath} $ip $port
-        fi
+                	# send details to fscan function.
+                	fscan ${folderPath} $ip $port
+		fi
+	else
+		echo "This target has already been scanned. File is at: ${folderPath}"
+	fi
 done
 
 # Since it is run by root, it may not be possible to read as a normal user.
