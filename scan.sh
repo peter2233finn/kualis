@@ -2,8 +2,6 @@
 # enter targets in the order: ip port protocol (Seperated by spaces. Should be copied from csv file)
 # targets is the file which contains the data in the format: ip port protocol
 
-config="/home/tools/perimeter-pentest/kualys/kualys.conf"
-
 # Error checking - check if root user
 if [ "$(id -u)" -ne 0 ]; then
         echo 'This script must be run by root' >&2
@@ -71,7 +69,8 @@ cat "$target" | sort | uniq | while read line; do
         port=$(echo "$line" |awk '{print $2}')
         proto=$(echo "$line" |awk '{print $3}')
         
-	folderPath="${folder}/${ip}-${port}"
+	mkdir "${folder}/${ip}"
+	folderPath="${folder}/${ip}/${port}"
 
         # Check if it has already been scanned. This is done by checking if an nmap file is present.
 	if [ ! -f "${folderPath}/nmap" ]; then
@@ -81,7 +80,11 @@ cat "$target" | sort | uniq | while read line; do
 		echo "============================================================="
 		echo "Target: $ip on port $port with $proto"
         	# Dig to check any DNS information.
-        	dig -x $ip > "${folderPath}/dns-dig" 2>&1
+		if [ ! -f "${folder}/dns-dig" ]; then
+        		dig -x $ip > "${folder}/dns-dig" 2>&1
+        		host $ip > "${folder}/dns-host" 2>&1
+		fi
+
         	# Skip if the protocol is not present. 
         	# This is the final variable after ip and port, so if it is not present then skip it.  
         	if [ ! -z $proto ]; then
