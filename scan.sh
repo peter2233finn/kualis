@@ -68,21 +68,20 @@ cat "$target" | sort | uniq | while read line; do
         ip=$(echo "$line" |awk '{print $1}')
         port=$(echo "$line" |awk '{print $2}')
         proto=$(echo "$line" |awk '{print $3}')
-        
-	mkdir "${folder}/${ip}"
-	folderPath="${folder}/${ip}/${port}"
+       	folderPath="${folder}/${ip}/${port}"
+	ipPath="${folder}/${ip}"
+
+	mkdir "${ipPath}"
+	mkdir "${folderPath}" 2> /dev/null
 
         # Check if it has already been scanned. This is done by checking if an nmap file is present.
 	if [ ! -f "${folderPath}/nmap" ]; then
-		# Unset and set the folder path.
-        	unset folderPath
-        	mkdir "$folderPath" 2> /dev/null
 		echo "============================================================="
 		echo "Target: $ip on port $port with $proto"
         	# Dig to check any DNS information.
-		if [ ! -f "${folder}/dns-dig" ]; then
-        		dig -x $ip > "${folder}/dns-dig" 2>&1
-        		host $ip > "${folder}/dns-host" 2>&1
+		if [ ! -f "${ipPath}/dns-dig" ]; then
+        		dig -x $ip > "${ipPath}/dns-dig" 2>&1
+        		host $ip > "${ipPath}/dns-host" 2>&1
 		fi
 
         	# Skip if the protocol is not present. 
