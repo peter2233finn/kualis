@@ -1,9 +1,6 @@
 ftp:                    ftp-nmap-scripts        nmap -sV -sC -Pn XXIPXX -p XXPORTXX --script="*ftp*" > XXFILEXX
+bgp:			bgp-nmap-scripts	nmap -sV -sC XXIPXX -p XXPORTXX --script="*asn*" -Pn
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX 2>&1
-http-alt:               curl-to-root            curl -v http://XXIPXX:XXPORTXX > XXFILEXX 2>&1
-http-alt:               gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null > /dev/null
-http:                   curl-to-root            curl -v http://XXIPXX:XXPORTXX > XXFILEXX 2>&1
-http:                   gobuster-directory      timeout 900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null > /dev/null
 isakmp?:                ike-scan                ike-scan XXIPXX --dport XXPORTXX -N -A > XXFILEXX 2>&1
 ldap:                   ldap-nmap-script        nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn > XXFILEXX
 ldap:                   ldapsearch              ldapsearch -H ldaps://XXIPXX:XXPORTXX/ -x -s base -b '' "(objectClass=*)" "*" + > XXFILEXX 2>&1
@@ -14,6 +11,7 @@ msrpc:                  rpcdump-to-port         timeout 300 rpcdump.py XXIPXX -p
 msrpc:                  rpcdump-without-port    timeout 300 rpcdump.py XXIPXX > XXFILEXX
 ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn  > XXFILEXX
+sip:			nmap-sip-scripts	nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
 smtp:                   SMTP-Relay-test         timeout 60 sendmail -t test@test.com -f test@test.com -s XXIPXX -u "Testing SMTP Relay" 2>&1 > XXFILEXX
 smtp:                   nmap-smtp-scripts       nmap XXIPXX -p XXPORTXX --script="*smtp*" -Pn  > XXFILEXX
 smtp:                   smtp-user-enum          smtp-user-enum -t XXIPXX -p XXPORTXX -U /usr/share/wordlists/common-snmp-community-strings.txt  > XXFILEXX
@@ -22,11 +20,20 @@ snmp:                   snmp-bulk-walk-v1       timeout 20 snmpbulkwalk -c publi
 snmp:                   snmp-bulk-walk-v2c      timeout 20 snmpbulkwalk -c public -v2c XXIPXX .  > XXFILEXX
 snmp:                   snmp-nmap-scripts       nmap -Pn XXIPXX -p XXPORTXX --script="snmp*"  > XXFILEXX
 ssh:                    ssh-audit               ssh-audit XXIPXX -p XXPORTXX  > XXFILEXX
-ssh:                    ssh-nmap-scripts        nmap -Pn XXIPXX -p XXPORTXX --script="ssh*"  > XXFILEXX
-ssl/http:               curl-to-root            curl -v https://XXIPXX:XXPORTXX > XXFILEXX 2>&1
-ssl/https:              gobuster-directory      timeout 900 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/big.txt -o XXFILEXX 2> /dev/null > /dev/null
-ssl/https:              nikto                   timeout 900 nikto -host https://XXIPXX:XXPORTXX > XXFILEXX
+ssh:                    ssh-nmap	        nmap -Pn XXIPXX -p XXPORTXX --script="ssh* and not brute"  > XXFILEXX
+ssh:                    ssh-nmap-brute	        nmap -Pn XXIPXX -p XXPORTXX --script="ssh-brute"  > XXFILEXX
+http:                   curl-to-root            curl -v http://XXIPXX:XXPORTXX > XXFILEXX 2>&1
+http:                   gobuster-directory      timeout 1900 gobuster dir -k -u http://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/common.txt -o XXFILEXX 2> /dev/null > /dev/null
+http:              nikto                   timeout 1900 nikto -Tuning 01234abcx57896 -host http://XXIPXX:XXPORTXX -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests
+ssl/https:              curl-to-root            curl --insecure -v https://XXIPXX:XXPORTXX > XXFILEXX 2>&1
+ssl/https:              gobuster-directory      timeout 1900 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/common.txt -o XXFILEXX 2> /dev/null > /dev/null
+ssl/https:              nikto                   timeout 1900 nikto -Tuning 01234abcx57896 -host https://XXIPXX:XXPORTXX -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests
 ssl/https:              sslscan                 sslscan XXIPXX:XXPORTXX > XXFILEXX
+https-alt:              curl-to-root            curl --insecure -v https://XXIPXX:XXPORTXX > XXFILEXX 2>&1
+https-alt:              gobuster-directory      timeout 1900 gobuster dir -k -u https://XXIPXX:XXPORTXX -w /usr/share/dirb/wordlists/common.txt -o XXFILEXX 2> /dev/null > /dev/null
+https-alt:              nikto                   timeout 1900 nikto -Tuning 01234abcx57896 -host https://XXIPXX:XXPORTXX -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests
+https-alt:              sslscan                 sslscan XXIPXX:XXPORTXX > XXFILEXX
+ssl/sun-sr-https:	nmap-ssl      		nmap XXIPXX -p XXPORTXX -Pn --script="*ssl*"  > XXFILEXX
 telnet:                 nmap-script-telnet      nmap XXIPXX -p XXPORTXX -Pn --script="*telnet*"  > XXFILEXX
 mysql:                  nmap-mysql-scripts      nmap XXIPXX -p XXPORTXX -Pn --script="mysql*" > XXFILEXX
 mysql:                  hydra-mysql             hydra -L /usr/share/wordlists/usernames.txt -P /usr/share/wordlists/rockyou.txt XXIPXX mysql -I -s XXPORTXX -o XXFILEXX
