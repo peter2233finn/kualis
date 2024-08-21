@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # to scan results copied from a Qualys csv file
 # enter targets in the order: ip port protocol (Seperated by spaces. Should be copied from csv file)
 # targets is the file which contains the data in the format: ip port protocol
@@ -9,19 +11,23 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 # Put user args into varables
-while getopts o:f:c: opts; do
+while getopts o:f:c:t: opts; do
         case ${opts} in
                 f) target="${OPTARG}" ;;
                 o) folder="${OPTARG}" ;;
                 c) customscripts="${OPTARG}" ;;
+                t) forks="${OPTARG}" ;;
         esac
 done
 
 # Error checking - Ensure the correct args are set by the user
 if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ]; then
-        echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file)"
+	echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file) -f (forks - how many hosts to scan at once)"
         exit
 fi
+
+# set the number of processes to 3 if not set by user
+[ -z "$forks" ] && forks=3
 
 # Ensure directory exists.
 mkdir "$folder" 2> /dev/null
@@ -62,6 +68,9 @@ fscan(){
 
 }
 
+declare -a PID=()
+pidNum=0
+
 # The following code iterates through each of the services.
 # It will ensure there is ip, port, protocol.
 cat "$target" | sort | uniq | while read line; do
@@ -97,8 +106,19 @@ cat "$target" | sort | uniq | while read line; do
                                 echo "nmap udp scan for ip: $ip port: $port protocol: $proto";
                                 nmap -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
                         fi
-                	# send details to fscan function.
-                	fscan ${folderPath} $ip $port
+
+			# Multithreading function
+			((pidNum++))
+			fscan ${folderPath} $ip $port &
+        		PID+=$!
+			if [ $(( $pidNum % $forks )) -eq 0 ]; then
+                		# Wait for all processes to finish
+                		for p in ${PID[@]}; do
+                        		tail --pid=$p -f /dev/null
+                		done
+				declare -a PID=()
+        		fi
+			sleep 1
 		fi
 	else
 		echo "This target has already been scanned. File is at: ${folderPath}"
