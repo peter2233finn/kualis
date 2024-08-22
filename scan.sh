@@ -22,7 +22,7 @@ done
 
 # Error checking - Ensure the correct args are set by the user
 if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ]; then
-	echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file) -f (forks - how many hosts to scan at once)"
+	echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file) -t (threads - how many hosts to scan at once)"
         exit
 fi
 
@@ -47,13 +47,19 @@ fscan(){
         # Find the service from the Nmap scan
         service=$(cat "${localFolder}/nmap"|grep -A 1 SERVICE|tail -n 1|awk '{print $3}'|tr "\t" " "|tr -d "?")
 
-        # Print to user the commands that will be run.
-        printf "\nThe service was detected as: ${service}.\n\nwill run the following commands and save them in the files.\n"
 
         # Create file with the commands to be run. Alter parameters using sed.
         grep "$service" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
+	
+	# Print to user the commands that will be run.
+	if [ $(wc -l $tmpFile | awk '{print $1}') -eq 0 ]; then
+		echo "This service was detected as ${service} does not have any pre-defined scripts."
+        	grep "unmatch" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
+	else
+        	printf "\nThe service was detected as ${service}.\n\nwill run the following commands and save them in the files.\n"
+	fi
 
-        while read l; do
+	while read l; do
                 fileName=$(echo ${l} | awk '{print $2}')
                 command=$(echo ${l} | awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}')
                 sanitizedFile="$(echo ${localFolder}/${fileName} | sed 's/\//\\\//g')"
@@ -80,17 +86,18 @@ cat "$target" | sort | uniq | while read line; do
        	folderPath="${folder}/${ip}/${port}"
 	ipPath="${folder}/${ip}"
 
-	mkdir "${ipPath}"
+	mkdir "${ipPath}" 2> /dev/null
 	mkdir "${folderPath}" 2> /dev/null
 
         # Check if it has already been scanned. This is done by checking if an nmap file is present.
 	if [ ! -f "${folderPath}/nmap" ]; then
 		echo "============================================================="
-		echo "Target: $ip on port $port with $proto"
+		echo "Target: $ip on port $port ($proto)"
         	# Dig to check any DNS information.
 		if [ ! -f "${ipPath}/dns-dig" ]; then
         		dig -x $ip > "${ipPath}/dns-dig" 2>&1
         		host $ip > "${ipPath}/dns-host" 2>&1
+        		whois $ip > "${ipPath}/whois" 2>&1
 		fi
 
         	# Skip if the protocol is not present. 
