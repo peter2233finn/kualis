@@ -1,5 +1,7 @@
 #!/bin/bash
 
+functionScript="/home/peter/kualis/actions.sh"
+
 # to scan results copied from a Qualys csv file
 # enter targets in the order: ip port protocol (Seperated by spaces. Should be copied from csv file)
 # targets is the file which contains the data in the format: ip port protocol
@@ -41,6 +43,7 @@ fscan(){
         tmpFile="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
         tmpFileCommand="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
         localFolder="${1}"
+	
 
         file="${localFolder}/${fileName}"
 
@@ -49,29 +52,37 @@ fscan(){
 
 
         # Create file with the commands to be run. Alter parameters using sed.
-        grep "$service" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
+        grep -E "^${service}:" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
 	
 	# Print to user the commands that will be run.
 	if [ $(wc -l $tmpFile | awk '{print $1}') -eq 0 ]; then
 		echo "This service was detected as ${service} does not have any pre-defined scripts."
-        	grep "unmatch" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
+        	grep -E "^unmatched:" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
 	else
-        	printf "\nThe service was detected as ${service}.\n\nwill run the following commands and save them in the files.\n"
+        	printf "\nThe service was detected as ${service}.\n\nwill run the following commands and save them in the files:\n\n"
 	fi
 
+
+	echo ". $functionScript" >> $tmpFileCommand
 	while read l; do
+		# load the function script to the payload
+
+		# set varables
                 fileName=$(echo ${l} | awk '{print $2}')
                 command=$(echo ${l} | awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}')
                 sanitizedFile="$(echo ${localFolder}/${fileName} | sed 's/\//\\\//g')"
+                sanitizedFolder="$(echo ${localFolder} | sed 's/\//\\\//g')\/"
+		
+                echo "${command}" | grep 'XXFILEXX'   | sed "s/XXFILEXX/${sanitizedFile}/g" >> $tmpFileCommand
+                echo "${command}" | grep 'XXFOLDERXX' | sed "s/XXFOLDERXX/${sanitizedFolder}/g" >> $tmpFileCommand
+	#	echo "Currently running: $(cat "$tmpFileCommand" | grep -v "$functionScript")"
+		chmod +x "$tmpFileCommand"
+		
 
-                echo "${command}" | sed "s/XXFILEXX/${sanitizedFile}/g" > $tmpFileCommand
-                printf "Currently running: "
-                cat "$tmpFileCommand"
-                sh "$tmpFileCommand"
         done < "$tmpFile"
-
-        rm $tmpFile $tmpFileCommand 2> /dev/null
-
+	cat "$tmpFileCommand"
+	chmod +x "$tmpFileCommand"
+	"$tmpFileCommand"
 }
 
 declare -a PID=()
@@ -89,9 +100,9 @@ cat "$target" | sort | uniq | while read line; do
 	mkdir "${ipPath}" 2> /dev/null
 	mkdir "${folderPath}" 2> /dev/null
 
+	echo "============================================================="
         # Check if it has already been scanned. This is done by checking if an nmap file is present.
 	if [ ! -f "${folderPath}/nmap" ]; then
-		echo "============================================================="
 		echo "Target: $ip on port $port ($proto)"
         	# Dig to check any DNS information.
 		if [ ! -f "${ipPath}/dns-dig" ]; then
@@ -116,7 +127,9 @@ cat "$target" | sort | uniq | while read line; do
 
 			# Multithreading function
 			((pidNum++))
-			fscan ${folderPath} $ip $port &
+
+			# FSCAN IS FORKED HERE
+			fscan ${folderPath} $ip $port 
         		PID+=$!
 			if [ $(( $pidNum % $forks )) -eq 0 ]; then
                 		# Wait for all processes to finish
@@ -128,7 +141,7 @@ cat "$target" | sort | uniq | while read line; do
 			sleep 1
 		fi
 	else
-		echo "This target has already been scanned. File is at: ${folderPath}"
+		echo "Target ${ip} on port ${port}  has already been scanned. File is at: ${folderPath}"
 	fi
 done
 
