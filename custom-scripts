@@ -1,43 +1,25 @@
-ftp:                    ftp-nmap-scripts        nmap -sV -sC -Pn XXIPXX -p XXPORTXX --script="*ftp*" > XXFILEXX
 bgp:			bgp-nmap-scripts	nmap -sV -sC XXIPXX -p XXPORTXX --script="*asn*" -Pn
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX 2>&1
 isakmp?:                ike-scan                ike-scan XXIPXX --dport XXPORTXX -N -A > XXFILEXX 2>&1
 ldap:                   ldap-nmap-script        nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn > XXFILEXX
 ldap:                   ldapsearch              ldapsearch -H ldaps://XXIPXX:XXPORTXX/ -x -s base -b '' "(objectClass=*)" "*" + > XXFILEXX 2>&1
-microsoft-ds:           SMB-scripts-nmap        nmap -sV -sC XXIPXX -p XXPORTXX --script="smb*" -Pn > XXFILEXX
-microsoft-ds:           nbtscan                 timeout 60 nbtscan -r XXIPXX > XXFILEXX 2>&1
 ms-sql-s:               ms-sql-nmap-script      nmap XXIPXX -p XXPORTXX -Pn --script="*ms-sql* and not *brute*" > XXFILEXX
-msrpc:                  rpcdump-to-port         timeout 300 rpcdump.py XXIPXX -p XXPORTXX > XXFILEXX
-msrpc:                  rpcdump-without-port    timeout 300 rpcdump.py XXIPXX > XXFILEXX
 ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 sip:			nmap-sip-scripts	nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
 
-
-
-
-
-
-
-
-ssl/sun-sr-https:	nmap-ssl      		nmap XXIPXX -p XXPORTXX -Pn --script="*ssl*"  > XXFILEXX
-telnet:                 nmap-script-telnet      nmap XXIPXX -p XXPORTXX -Pn --script="*telnet*"  > XXFILEXX
-mysql:                  nmap-mysql-scripts      nmap XXIPXX -p XXPORTXX -Pn --script="mysql*" > XXFILEXX
-mysql:                  hydra-mysql             hydra -L /usr/share/wordlists/usernames.txt -P /usr/share/wordlists/rockyou.txt XXIPXX mysql -I -s XXPORTXX -o XXFILEXX
-
-
-
-unknown:                unknown-nmap            nmap XXIPXX -p XXPORTXX -Pn -sV -sC -oA enum > XXFILEXX
-unknown:                unknown-curl-http       curl http://XXIPXX:XXPORTXX  > XXFILEXX 2>&1
-unknown:                unknown-curl-https      curl https://XXIPXX:XXPORTXX > XXFILEXX 2>&1
-unmatch:		unknown-nmap		nmap -sV -sC XXIPXX -p XXPORTXX --script="*" > XXFILEXX 2>&1
-smtp:			null			smtp-function XXIPXX XXPORTXX XXFOLDERXX
-snmp:			null			snmp-function XXIPXX XXPORTXX XXFOLDERXX
-http:                   null            	http-function XXIPXX XXPORTXX XXFOLDERXX
-ssh:			null			ssh-function XXIPXX XXPORTXX XXFOLDERXX
-ssl/https:		null			https-function XXIPXX XXPORTXX XXFOLDERXX
-ssl/https:		null			ssl-function XXIPXX XXPORTXX XXFOLDERXX
-ssl/http:		null			https-function XXIPXX XXPORTXX XXFOLDERXX
-ssl/http:		null			ssl-function XXIPXX XXPORTXX XXFOLDERXX
-https-alt:              null            	https-function XXIPXX XXPORTXX XXFOLDERX
-https-alt:		null			ssl-function XXIPXX XXPORTXX XXFOLDERXX
+microsoft-ds:           null			microsoft-ds-function	XXIPXX XXPORTXX XXFOLDERXX
+msrpc:                  null         		msrcp-function		XXIPXX XXPORTXX XXFOLDERXX
+unmatch:		null			unknown-function 	XXIPXX XXPORTXX XXFOLDERXX
+mysql:			null			mysql-function 		XXIPXX XXPORTXX XXFOLDERXX
+smtp:			null			smtp-function 		XXIPXX XXPORTXX XXFOLDERXX
+snmp:			null			snmp-function 		XXIPXX XXPORTXX XXFOLDERXX
+http:                   null            	http-function 		XXIPXX XXPORTXX XXFOLDERXX
+ssh:			null			ssh-function 		XXIPXX XXPORTXX XXFOLDERXX
+ssl/https:		null			https-function 		XXIPXX XXPORTXX XXFOLDERXX
+ssl/https:		null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
+ssl/http:		null			https-function 		XXIPXX XXPORTXX XXFOLDERXX
+ssl/http:		null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
+https-alt:              null            	https-function 		XXIPXX XXPORTXX XXFOLDERXX
+https-alt:		null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
+ssl/sun-sr-https:	null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
