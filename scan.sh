@@ -1,7 +1,4 @@
 #!/bin/bash
-
-functionScript="/home/peter/kualis/actions.sh"
-
 # to scan results copied from a Qualys csv file
 # enter targets in the order: ip port protocol (Seperated by spaces. Should be copied from csv file)
 # targets is the file which contains the data in the format: ip port protocol
@@ -13,8 +10,9 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 # Put user args into varables
-while getopts o:f:c:t: opts; do
+while getopts a:o:f:c:t: opts; do
         case ${opts} in
+                a) functionScript="${OPTARG}" ;;
                 f) target="${OPTARG}" ;;
                 o) folder="${OPTARG}" ;;
                 c) customscripts="${OPTARG}" ;;
@@ -23,8 +21,8 @@ while getopts o:f:c:t: opts; do
 done
 
 # Error checking - Ensure the correct args are set by the user
-if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ]; then
-	echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file) -t (threads - how many hosts to scan at once)"
+if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ] || [ -z "$functionScript" ]; then
+	echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file) -a (functions script - this is the actions.sh file) -t (threads - how many hosts to scan at once)"
         exit
 fi
 
