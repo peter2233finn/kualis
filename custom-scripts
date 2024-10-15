@@ -1,4 +1,4 @@
-bgp:			bgp-nmap-scripts	nmap -sV -sC XXIPXX -p XXPORTXX --script="*asn*" -Pn
+bgp:                    bgp-nmap-scripts        nmap -sV -sC XXIPXX -p XXPORTXX --script="*asn*" -Pn
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX 2>&1
 isakmp?:                ike-scan                ike-scan XXIPXX --dport XXPORTXX -N -A > XXFILEXX 2>&1
 ldap:                   ldap-nmap-script        nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn > XXFILEXX
@@ -6,20 +6,23 @@ ldap:                   ldapsearch              ldapsearch -H ldaps://XXIPXX:XXP
 ms-sql-s:               ms-sql-nmap-script      nmap XXIPXX -p XXPORTXX -Pn --script="*ms-sql* and not *brute*" > XXFILEXX
 ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn  > XXFILEXX
-sip:			nmap-sip-scripts	nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
+sip:                    nmap-sip-scripts        nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
 
-microsoft-ds:           null			microsoft-ds-function	XXIPXX XXPORTXX XXFOLDERXX
-msrpc:                  null         		msrcp-function		XXIPXX XXPORTXX XXFOLDERXX
-unmatch:		null			unknown-function 	XXIPXX XXPORTXX XXFOLDERXX
-mysql:			null			mysql-function 		XXIPXX XXPORTXX XXFOLDERXX
-smtp:			null			smtp-function 		XXIPXX XXPORTXX XXFOLDERXX
-snmp:			null			snmp-function 		XXIPXX XXPORTXX XXFOLDERXX
-http:                   null            	http-function 		XXIPXX XXPORTXX XXFOLDERXX
-ssh:			null			ssh-function 		XXIPXX XXPORTXX XXFOLDERXX
-ssl/https:		null			https-function 		XXIPXX XXPORTXX XXFOLDERXX
-ssl/https:		null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
-ssl/http:		null			https-function 		XXIPXX XXPORTXX XXFOLDERXX
-ssl/http:		null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
-https-alt:              null            	https-function 		XXIPXX XXPORTXX XXFOLDERXX
-https-alt:		null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
-ssl/sun-sr-https:	null			ssl-function 		XXIPXX XXPORTXX XXFOLDERXX
+microsoft-ds:           null                    microsoft-ds-function   XXIPXX XXPORTXX XXFOLDERXX
+msrpc:                  null                    msrcp-function          XXIPXX XXPORTXX XXFOLDERXX
+unmatch:                null                    unknown-function        XXIPXX XXPORTXX XXFOLDERXX
+mysql:                  null                    mysql-function          XXIPXX XXPORTXX XXFOLDERXX
+smtp:                   null                    smtp-function           XXIPXX XXPORTXX XXFOLDERXX
+snmp:                   null                    snmp-function           XXIPXX XXPORTXX XXFOLDERXX
+http-alt:               null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
+http:                   null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
+ssh:                    null                    ssh-function            XXIPXX XXPORTXX XXFOLDERXX
+https:                  null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
+https:                  null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/https:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
+ssl/https:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/http:               null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
+ssl/http:               null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+https-alt:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
+https-alt:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/sun-sr-https:       null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
