@@ -29,4 +29,5 @@ ssl/http:               null                    ssl-function            XXIPXX X
 https-alt:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 https-alt:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/sun-sr-https:       null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/dlip                null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ftp:                    null                    ftp-function            XXIPXX XXPORTXX XXFOLDERXX
