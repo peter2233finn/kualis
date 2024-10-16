@@ -9,7 +9,7 @@ omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX 
 sip:                    nmap-sip-scripts        nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
 
 microsoft-ds:           null                    microsoft-ds-function   XXIPXX XXPORTXX XXFOLDERXX
-msrpc:                  null                    msrcp-function          XXIPXX XXPORTXX XXFOLDERXX
+msrpc:                  null                    rpc-function            XXIPXX XXPORTXX XXFOLDERXX
 unmatch:                null                    unknown-function        XXIPXX XXPORTXX XXFOLDERXX
 mysql:                  null                    mysql-function          XXIPXX XXPORTXX XXFOLDERXX
 smtp:                   null                    smtp-function           XXIPXX XXPORTXX XXFOLDERXX
@@ -17,6 +17,9 @@ snmp:                   null                    snmp-function           XXIPXX X
 http-alt:               null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
 http:                   null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
 ssh:                    null                    ssh-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/ms-wbt-server:      null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/ms-wbt-server:      null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
+ms-wbt-server:          null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
 https:                  null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 https:                  null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/https:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
@@ -26,3 +29,4 @@ ssl/http:               null                    ssl-function            XXIPXX X
 https-alt:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 https-alt:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/sun-sr-https:       null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ftp:                    null                    ftp-function            XXIPXX XXPORTXX XXFOLDERXX
