@@ -24,6 +24,8 @@ https:                  null                    https-function          XXIPXX X
 https:                  null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/https:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 ssl/https:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/https-alt:          null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
+ssl/https-alt:          null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/http:               null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 ssl/http:               null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 https-alt:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
