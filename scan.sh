@@ -1,4 +1,4 @@
-#!/bin/bash                                                                                                                                                                                                              02:53:25 [96/1972]
+#!/bin/bash
 # to scan results copied from a Qualys csv file                                                                                                                                                                                            
 # enter targets in the order: ip port protocol (Seperated by spaces. Should be copied from csv file)                                                                                                                                       
 # targets is the file which contains the data in the format: ip port protocol                                                                                                                                                              
@@ -29,7 +29,9 @@ fi
                                                                                                                                                                                                                                            
 # set the number of processes to 3 if not set by user                                                                                                                                                                                      
 [ -z "$forks" ] && forks=3                                                                                                                                                                                                                 
-                                                                                                                                                                                                                                           
+ 
+echo "Using $forks threads."
+
 # Ensure directory exists.                                                                                                                                                                                                                 
 mkdir "$folder" 2> /dev/null                                                                                                                                                                                                               
                                                                                                                                                                                                                                            
@@ -37,11 +39,11 @@ mkdir "$folder" 2> /dev/null
 # fscan function takes the following parameters:                                                                                                                                                                                           
 # fscan folderPath ip port
 fscan(){
-        port="$3"
-        ip="$2"
-        tmpFile="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
-        tmpFileCommand="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
-        localFolder="${1}"
+        local fport="$3"
+        local fip="$2"
+        local tmpFile="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
+        local tmpFileCommand="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
+        local localFolder="${1}"
 
 
         file="${localFolder}/${fileName}"
@@ -51,14 +53,14 @@ fscan(){
 
 
         # Create file with the commands to be run. Alter parameters using sed.
-        grep -E "^${service}:" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
+        grep -E "^${service}:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" > $tmpFile
 
         # Print to user the commands that will be run.
         if [ $(wc -l $tmpFile | awk '{print $1}') -eq 0 ]; then
                 echo "This service was detected as ${service} does not have any pre-defined scripts."
-                grep -E "^unmatched:" ${customscripts} | sed "s/XXIPXX/${ip}/g" | sed "s/XXPORTXX/${port}/g" > $tmpFile
+                grep -E "^unmatched:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" > $tmpFile
         else
-                printf "\nThe service was detected as ${service}.\n\nwill run the following commands and save them in the files:\n\n"                                                                                    02:53:25 [36/1972]
+                printf "\nThe service was detected as ${service}.\n\nwill run the following commands and save them in the files:\n\n"
         fi
 
 
@@ -89,10 +91,11 @@ pidNum=0
 
 # The following code iterates through each of the services.
 # It will ensure there is ip, port, protocol.
-cat "$target" | sort | uniq | while read line; do
-        ip=$(echo "$line" |awk '{print $1}')
-        port=$(echo "$line" |awk '{print $2}')
-        proto=$(echo "$line" |awk '{print $3}')
+cat "$target" | sort | uniq | grep -Ei --color=never "udp|tcp" | while read line; do
+	sleep 0.2
+	ip=$(echo "$line" |awk '{print $1}' | xargs)
+        port=$(echo "$line" |awk '{print $2}' | xargs)
+        proto=$(echo "$line" |awk '{print $3}' | xargs)
         folderPath="${folder}/${ip}/${port}"
         ipPath="${folder}/${ip}"
 
@@ -128,19 +131,21 @@ cat "$target" | sort | uniq | while read line; do
                         ((pidNum++))
 
                         # FSCAN IS FORKED HERE
-                        fscan ${folderPath} $ip $port 
+                        fscan "${folderPath}" "$ip" "$port" &
                         PID+=$!
+			unset ip port proto folderPath ipPath 
                         if [ $(( $pidNum % $forks )) -eq 0 ]; then
                                 # Wait for all processes to finish
                                 for p in ${PID[@]}; do
                                         tail --pid=$p -f /dev/null
                                 done
                                 declare -a PID=()
+				pidNum=0
                         fi
                         sleep 1
                 fi
         else
-                echo "Target ${ip} on port ${port}  has already been scanned. File is at: ${folderPath}"
+                echo "Target ${ip} on port ${port} has already been scanned. File is at: ${folderPath}"
         fi
 done
 
