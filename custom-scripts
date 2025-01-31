@@ -8,14 +8,19 @@ ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXI
 omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 sip:                    nmap-sip-scripts        nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
 
+
+
 microsoft-ds:           null                    microsoft-ds-function   XXIPXX XXPORTXX XXFOLDERXX
+netbios-ssn:            null                    netbios-function	XXIPXX XXPORTXX XXFOLDERXX
 msrpc:                  null                    rpc-function            XXIPXX XXPORTXX XXFOLDERXX
 unmatch:                null                    unknown-function        XXIPXX XXPORTXX XXFOLDERXX
+telnet:                 null                    telnet-function         XXIPXX XXPORTXX XXFOLDERXX
 mysql:                  null                    mysql-function          XXIPXX XXPORTXX XXFOLDERXX
 smtp:                   null                    smtp-function           XXIPXX XXPORTXX XXFOLDERXX
 snmp:                   null                    snmp-function           XXIPXX XXPORTXX XXFOLDERXX
 http-alt:               null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
 http:                   null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
+http-rpc-epmap:		      null			              http-function		XXIPXX XXPORTXX XXFOLDERXX
 ssh:                    null                    ssh-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/ms-wbt-server:      null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/ms-wbt-server:      null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
@@ -28,6 +33,7 @@ ssl/https-alt:          null                    https-function          XXIPXX X
 ssl/https-alt:          null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/http:               null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 ssl/http:               null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/coldfusion-auth:    null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 https-alt:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 https-alt:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/sun-sr-https:       null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
