@@ -1,5 +1,5 @@
 #! /bin/bash
-brute=false
+brute=true
 
 function issueList {
 	# $1 complete file
@@ -40,6 +40,12 @@ function http-function {
 	issueList "${folder}nikto" "header is not" "Missing HTTP Header: "
 }
 
+
+function telnet-function {
+	ip=$1; port=$2; folder=$3
+	nmap ${ip} -p ${port} --script "telnet* and not brute" > "${folder}/nmap-telnet-no-brute"
+	[ $brute = true ] && nmap -Pn ${ip} -p ${port} -sV --script="telnet-brute"  > "${folder}nmap-telnet-brute-force"
+}
 
 
 function ssh-function {
@@ -145,4 +151,10 @@ function rdp-function {
 	ip=$1; port=$2; folder=$3
 	nmap $ip -p $port -Pn --script="*rdp* and not brute" > ${folder}rdp-nmap-scripts
 	[ $brute = true ] && nmap ${ip} -p ${port} -Pn --script="rdp-brute"  > ${folder}nmap-rdp-brute
+}
+function netbios-function {
+	ip=$1; port=$2; folder=$3
+	nmblookup -A ${ip} > ${folder}/nmblookup
+	nmap -sU -Pn --script="nb*" ${ip} > ${folder}/nmap-netbios-scripts
+	enum4linux -a ${ip} > ${folder}/enum4linux
 }
