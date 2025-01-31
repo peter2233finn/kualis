@@ -45,7 +45,6 @@ fscan(){
         local tmpFileCommand="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
         local localFolder="${1}"
 
-
         file="${localFolder}/${fileName}"
 
         # Find the service from the Nmap scan
@@ -91,68 +90,94 @@ pidNum=0
 
 # The following code iterates through each of the services.
 # It will ensure there is ip, port, protocol.
-cat "$target" | sort | uniq | grep -Ei --color=never "udp|tcp" | while read line; do
-	sleep 0.2
-	ip=$(echo "$line" |awk '{print $1}' | xargs)
-        port=$(echo "$line" |awk '{print $2}' | xargs)
-        proto=$(echo "$line" |awk '{print $3}' | xargs)
-        folderPath="${folder}/${ip}/${port}"
-        ipPath="${folder}/${ip}"
 
-        mkdir "${ipPath}" 2> /dev/null
-        mkdir "${folderPath}" 2> /dev/null
+touch /tmp/jhsjdhieif
+while [ -f "/tmp/jhsjdhieif" ]; do
+	rm /tmp/jhsjdhieif
+	cat "$target" | sort | uniq | grep -Ei --color=never "udp|tcp" | while read line; do
+		ip=$(echo "$line" |awk '{print $1}' | xargs)
+		port=$(echo "$line" |awk '{print $2}' | xargs)
+		proto=$(echo "$line" |awk '{print $3}' | xargs)
+		folderPath="${folder}/${ip}/${port}"
+		ipPath="${folder}/${ip}"
 
-        echo "============================================================="
-        # Check if it has already been scanned. This is done by checking if an nmap file is present.
-        if [ ! -f "${folderPath}/nmap" ]; then
-                echo "Target: $ip on port $port ($proto)"
-                # Dig to check any DNS information.
-                if [ ! -f "${ipPath}/dns-dig" ]; then
-                        dig -x $ip > "${ipPath}/dns-dig" 2>&1
-                        host $ip > "${ipPath}/dns-host" 2>&1
-                        whois $ip > "${ipPath}/whois" 2>&1
-                fi
+		
+		# half arsed fix for some stupid bug I cant figure out
+		# 192.168.1.1 will turn into 92.168.1.1 for some reason after a number of forks
+		# Spent hours on the problem and cant figure the fucking thing out. 
+		# Had incedent where scanning and bruting out-of-scope IPs
+		if [ -z "$(grep -E "^$ip" "$target" )" ]; then touch /tmp/jhsjdhieif; break; fi
+		
+		mkdir "${ipPath}" 2> /dev/null
+		mkdir "${folderPath}" 2> /dev/null
+		
+		echo "============================================================="
 
-                # Skip if the protocol is not present. 
-                # This is the final variable after ip and port, so if it is not present then skip it.  
-                if [ ! -z $proto ]; then
-                        # Sort if tcp or udp, this will determine the nmap scan.
-                        # If not tcp or udp, then skip.
-                        if [ "$proto" = "tcp" ]; then
-                        echo "Nmap tcp scan for ip: $ip port: $port protocol: $proto";
-                                nmap -Pn -sV -sC $ip -p $port >> "${folderPath}/nmap"
+		# Check if it has already been scanned. This is done by checking if an nmap file is present.
+		if [ ! -f "${folderPath}/nmap" ]; then
+			echo "Target: $ip on port $port ($proto)"
+			# Dig to check any DNS information.
+			if [ ! -f "${ipPath}/dns-dig" ]; then
+				dig -x $ip > "${ipPath}/dns-dig" 2>&1
+				host $ip > "${ipPath}/dns-host" 2>&1
+				whois $ip > "${ipPath}/whois" 2>&1
+			fi
 
-                        elif [ "$proto" = "udp" ]; then
-                                echo "nmap udp scan for ip: $ip port: $port protocol: $proto";
-                                nmap -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
-                        fi
+			# Skip if the protocol is not present. 
+			# This is the final variable after ip and port, so if it is not present then skip it.  
+			if [ ! -z $proto ]; then
+				# Sort if tcp or udp, this will determine the nmap scan.
+				# If not tcp or udp, then skip.
+				if [ "$proto" = "tcp" ]; then
+				echo "Nmap tcp scan for ip: $ip port: $port protocol: $proto";
+					nmap -Pn -sV -sC $ip -p $port >> "${folderPath}/nmap"
 
-                        # Multithreading function
-                        ((pidNum++))
+				elif [ "$proto" = "udp" ]; then
+					echo "Nmap udp scan for ip: $ip port: $port protocol: $proto";
+					nmap -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
+				fi
 
-                        # FSCAN IS FORKED HERE
-                        fscan "${folderPath}" "$ip" "$port" &
-                        PID+=$!
-			unset ip port proto folderPath ipPath 
-                        if [ $(( $pidNum % $forks )) -eq 0 ]; then
-                                # Wait for all processes to finish
-                                for p in ${PID[@]}; do
-                                        tail --pid=$p -f /dev/null
-                                done
-                                declare -a PID=()
-				pidNum=0
-                        fi
-                        sleep 1
-                fi
-        else
-                echo "Target ${ip} on port ${port} has already been scanned. File is at: ${folderPath}"
-        fi
+				# Multithreading function
+				((pidNum++))
+
+				
+				# FSCAN IS FORKED HERE
+				fscan "${folderPath}" "$ip" "$port" &
+				PID+=$!
+				unset ip port proto folderPath ipPath 
+				if [ $(( $pidNum % $forks )) -eq 0 ]; then
+					# Wait for all processes to finish
+					for process in ${PID[@]}; do
+						tail --pid=$process -f /dev/null
+					done
+					declare -a PID=()
+					pidNum=0
+				fi
+			fi
+		else
+			echo "Target ${ip} on port ${port} has already been scanned. File is at: ${folderPath}"
+		fi
+	done
+
+	# chack if all hosts are scanned.
+	# Exit once they are.
+	rm /tmp/jhsjdhieif
+	cat "$target" | sort | uniq | grep -Ei --color=never "udp|tcp" | while read line; do
+		ip=$(echo "$line" |awk '{print $1}' | xargs)
+		port=$(echo "$line" |awk '{print $2}' | xargs)
+		nmapPath="${folder}/${ip}/${port}/nmap"
+		if [ ! -f "$nmapPath" ]; then 
+			echo "Rescanning $nmapPath"
+			touch /tmp/jhsjdhieif
+			break
+		fi
+		
+	done
+		
 done
-
 # Since it is run by root, it may not be possible to read as a normal user.
 # change permissions to 777.
 chmod -R 777 "${folder}"
 
 # print summary.
 printf "\n\n========================================================\nScan ran sucessfully. Here are the results: \n" 
-ls "${folder}" |tr "-" " "|awk '{print $1}'|sort|uniq -c|sort|awk '{print "There are: "$1" ports scanned for the IP address: " $2}'
