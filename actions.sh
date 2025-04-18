@@ -32,7 +32,7 @@ function issueRed {
 
 function http-function {
 	ip=$1; port=$2; folder=$3
-	curl -v "http://${ip}:${port}" > "${folder}curl-to-root" 2>&1
+	curl -v "http://${ip}:${port}" > "${folder}curl-to-root-http" 2>&1
 	curl -v "http://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	timeout 1900 gobuster dir -k -u http://${ip}:${port} -w /usr/share/dirb/wordlists/common.txt -b ${blacklist} -o "${folder}gobuster" 2> /dev/null > /dev/null
