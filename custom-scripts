@@ -25,6 +25,8 @@ http-rpc-epmap:		      null			              http-function		        XXIPXX XXPORT
 ssh:                    null                    ssh-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/ms-wbt-server:      null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/ms-wbt-server:      null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/tram:               null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+ssl/unknown             null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ms-wbt-server:          null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
 https:                  null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 https:                  null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
