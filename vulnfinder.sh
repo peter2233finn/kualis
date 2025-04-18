@@ -26,7 +26,9 @@ function simpleFind () {
         #grep -Ri "$folder" $2
 }
 
+simpleFind "HIGH: The server accepts HTTP connections with code 200. may not redirect" "200 OK" "curl-to-root-http"
+
+simpleFind "LOW: Trace method allowed" "Access-Control-Allow-Methods" "curl-to-root"
 
 simpleFind "INFO: SSH Version detected" "OpenSSH " "nmap-ssh-no-brute" 
-simpleFind "LOW: Trace method allowed" "Access-Control-Allow-Methods" "curl-to-root"
 simpleFind "INFO: Server header in use" "Server: " "curl-to-root"
