@@ -11,7 +11,7 @@ sip:                    nmap-sip-scripts        nmap XXIPXX -p XXPORTXX --script
 
 
 microsoft-ds:           null                    microsoft-ds-function   XXIPXX XXPORTXX XXFOLDERXX
-netbios-ssn:            null                    netbios-function	XXIPXX XXPORTXX XXFOLDERXX
+netbios-ssn:            null                    netbios-function	      XXIPXX XXPORTXX XXFOLDERXX
 msrpc:                  null                    rpc-function            XXIPXX XXPORTXX XXFOLDERXX
 unmatch:                null                    unknown-function        XXIPXX XXPORTXX XXFOLDERXX
 telnet:                 null                    telnet-function         XXIPXX XXPORTXX XXFOLDERXX
@@ -20,13 +20,16 @@ smtp:                   null                    smtp-function           XXIPXX X
 snmp:                   null                    snmp-function           XXIPXX XXPORTXX XXFOLDERXX
 http-alt:               null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
 http:                   null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
-http-rpc-epmap:		      null			              http-function		XXIPXX XXPORTXX XXFOLDERXX
+http-proxy              null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
+http-rpc-epmap:		      null			              http-function		        XXIPXX XXPORTXX XXFOLDERXX
 ssh:                    null                    ssh-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/ms-wbt-server:      null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/ms-wbt-server:      null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
 ms-wbt-server:          null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
 https:                  null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 https:                  null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
+https-proxy             null                   http-function            XXIPXX XXPORTXX XXFOLDERXX
+https-proxy             null                   ssl-function             XXIPXX XXPORTXX XXFOLDERXX
 ssl/https:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
 ssl/https:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
 ssl/https-alt:          null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
