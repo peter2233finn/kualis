@@ -48,11 +48,14 @@ function http-proxy-function {
         )
 
         for i in "${targets[@]}"; do
-                echo "==== testing connection to: $i ===="
-                echo "== https connection: =="
+                echo
+		echo
+  		echo "====== testing connection to: $i ======"
+                echo "=== https connection: ==="
                 timeout 3 curl -vv -k --proxy ${ip}:${port} https://$i
 
-                echo "== http connection: =="
+		echo
+                echo "=== http connection: ==="
                 timeout 3 curl -vv --proxy ${ip}:${port} http://$i
         done > ${folder}/http-proxy-to-addresses 2>&1
 }
