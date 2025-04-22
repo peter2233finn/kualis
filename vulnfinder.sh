@@ -51,7 +51,12 @@ function regexFind () {
 }
 
 
-simpleFind "HIGH: The server accepts HTTP connections with code 200. may not redirect" "200 OK" "curl-to-root-http"
+simpleFind "MEDIUM: SSL/TLS - TLSv1.0 is enabled." "TLSv1.0" "enabled" "sslscan"
+simpleFind "MEDIUM: SMB message signing not required." "Message signing enabled but not required" "smb-nmap-scripts"
+simpleFind "LOW: SSL/TLS - TLSv1.1 is enabled." "TLSv1.1" "enabled" "sslscan"
+simpleFind "HIGH: Plaintext Protocol: FTP is enabled" "open"  "ftp" "ftp-nmap-scripts"
+simpleFind "HIGH: Plaintext Protocol: Telnet is enabled" "open"  "telnet" "telnet-nmap-scripts"
+simpleFind "HIGH: Plaintext Protocol: The server accepts HTTP connections with code 200. may not redirect" "200 OK" "curl-to-root-http"
 regexFind  "MEDIUM: The SSH server is using weak algorythms/hashes/mac" "algorithm to remove|\[fail\]" "ssh-audit"
 simpleFind "LOW: Trace method allowed" "Access-Control-Allow-Methods" "curl-to-root"
 simpleFind "INFO: SSH Version detected" "OpenSSH " "nmap-ssh-no-brute" 
