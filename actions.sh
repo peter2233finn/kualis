@@ -31,35 +31,31 @@ function issueRed {
 }
 
 function http-proxy-function {
-        ip=$1; port=$2; folder=$3
-        targets=(
-            "127.0.0.1"
-            "localhost"
-            "169.254.169.254"    # AWS metadata
-            "10.0.0.1"
-            "10.0.1.1"
-            "10.1.1.1"
-            "192.168.0.1"
-            "192.168.1.1"
-            "192.168.10.1"
-            "172.16.0.1"
-            "172.16.1.1"
-            "google.com"
-        )
+	ip=$1; port=$2; folder=$3
+	targets=(
+	    "127.0.0.1"
+	    "localhost"
+	    "169.254.169.254"    # AWS metadata
+	    "10.0.0.1"
+	    "10.0.1.1"
+	    "10.1.1.1"
+	    "192.168.0.1"
+	    "192.168.1.1"
+	    "192.168.10.1"
+	    "172.16.0.1"
+	    "172.16.1.1"
+	    "google.com"
+	)
 
-        for i in "${targets[@]}"; do
-                echo
-		echo
-  		echo "====== testing connection to: $i ======"
-                echo "=== https connection: ==="
-                timeout 3 curl -vv -k --proxy ${ip}:${port} https://$i
+	for i in "${targets[@]}"; do
+		echo "==== testing connection to: $i ===="
+		echo "== https connection: =="
+		timeout 3 curl -vv -k --proxy ${ip}:${port} https://$i
 
-		echo
-                echo "=== http connection: ==="
-                timeout 3 curl -vv --proxy ${ip}:${port} http://$i
-        done > ${folder}/http-proxy-to-addresses 2>&1
+		echo "== http connection: =="
+		timeout 3 curl -vv --proxy ${ip}:${port} http://$i
+	done > ${folder}/http-proxy-to-addresses 2>&1
 }
-
 
 function http-function {
 	ip=$1; port=$2; folder=$3
@@ -67,7 +63,7 @@ function http-function {
 	curl -v "http://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	timeout 1900 gobuster dir -k -u http://${ip}:${port} -w /usr/share/dirb/wordlists/common.txt -b ${blacklist} -o "${folder}gobuster" 2> /dev/null > /dev/null
-	timeout 1900 nikto -Tuning 01234abcx57896 -host http://${ip}:${port} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
+	timeout 1900 nikto -port ${port} -Tuning 01234abcx57896 -host http://${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
 	issueList "${folder}nikto" "header is not" "Missing HTTP Header: "
 }
 
@@ -93,7 +89,7 @@ function https-function {
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	
 	timeout 1900 gobuster dir -k -u https://${ip}:${port} -b ${blacklist} -w /usr/share/dirb/wordlists/common.txt -o "${folder}gobuster" 2> /dev/null > /dev/null
-	timeout 1900 nikto -Tuning 01234abcx57896 -host https://${ip}:${port} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
+	timeout 1900 nikto -port ${port} -Tuning 01234abcx57896 -host https://${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
 	issueList "${folder}nikto" "header is not" "Missing HTTP Header: "
 	
 }
@@ -149,9 +145,14 @@ function msrcp-function {
 	timeout 300 rpcdump.py ${ip} -p ${port} > ${folder}rpcdump-to-port
 }
 
+function mssql-function {
+	ip=$1; port=$2; folder=$3
+	[ $brute = true ] && nmap ${ip} -p ${port} -Pn --script="ms-sql-brute" > ${folder}/mssql-brute-nmap
+}
+
 function microsoft-ds-function {
 	ip=$1; port=$2; folder=$3
-	nmap -sV -sC ${ip} -p ${port} --script="smb*" -Pn > ${folder}SMB-scripts-nmap
+	nmap -sV -sC ${ip} -p ${port} --script="smb*" -Pn > ${folder}smb-nmap-scripts
 	timeout 60 nbtscan -v -r ${ip} > ${folder}nbtscan 2>&1
 	[ $brute = true ] && hydra -t 1  -f -l administrator -P /usr/share/wordlists/rockyou.txt $ip smb
 	issueList "${folder}nbtscan" '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' "Possibly add to scope (from nbtscan): "
@@ -168,20 +169,20 @@ function ftp-function {
 function dns-function {
 	ip=$1; port=$2; folder=$3
 	nmap $ip -p $port -Pn --script="dns* and not brute" > ${folder}nmap-dns
- 	[ $brute = true ] && nmap $ip -p $port -Pn --script="dns-brute" > ${folder}nmap-dns-brute
+ 	[ $brute = true ] && nmap $ip -p $port -Pn --script="dns-brute" > ${folder}dns-brute-nmap
 
 }
 
 function rpc-function {
 	ip=$1; port=$2; folder=$3
 	nmap $ip -p $port -Pn --script="*rpc* and not brute" > ${folder}rpc-nmap-scripts
-	[ $brute = true ] && nmap ${ip} -p ${port} -Pn --script="rpcap-brute"  > ${folder}nmap-rpc-brute
+	[ $brute = true ] && nmap ${ip} -p ${port} -Pn --script="rpcap-brute"  > ${folder}rpc-brute-nmap
 }
 
 function rdp-function {
 	ip=$1; port=$2; folder=$3
 	nmap $ip -p $port -Pn --script="*rdp* and not brute" > ${folder}rdp-nmap-scripts
-	[ $brute = true ] && nmap ${ip} -p ${port} -Pn --script="rdp-brute"  > ${folder}nmap-rdp-brute
+	[ $brute = true ] && nmap ${ip} -p ${port} -Pn --script="rdp-brute"  > ${folder}rdp-brute-nmap
 }
 function netbios-function {
 	ip=$1; port=$2; folder=$3
