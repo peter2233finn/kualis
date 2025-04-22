@@ -65,7 +65,7 @@ function https-function {
 
 function ssl-function {
 	ip=$1; port=$2; folder=$3
-	sslscan ${ip}:${port} > "${folder}sslscan"
+	sslscan --no-colour ${ip}:${port} > "${folder}sslscan"
 }
 
 function smtp-function {
