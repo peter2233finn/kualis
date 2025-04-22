@@ -30,6 +30,34 @@ function issueRed {
 	rm $tmpFile
 }
 
+function http-proxy-function {
+        ip=$1; port=$2; folder=$3
+        targets=(
+            "127.0.0.1"
+            "localhost"
+            "169.254.169.254"    # AWS metadata
+            "10.0.0.1"
+            "10.0.1.1"
+            "10.1.1.1"
+            "192.168.0.1"
+            "192.168.1.1"
+            "192.168.10.1"
+            "172.16.0.1"
+            "172.16.1.1"
+            "google.com"
+        )
+
+        for i in "${targets[@]}"; do
+                echo "==== testing connection to: $i ===="
+                echo "== https connection: =="
+                timeout 3 curl -vv -k --proxy ${ip}:${port} https://$i
+
+                echo "== http connection: =="
+                timeout 3 curl -vv --proxy ${ip}:${port} http://$i
+        done > ${folder}/http-proxy-to-addresses 2>&1
+}
+
+
 function http-function {
 	ip=$1; port=$2; folder=$3
 	curl -v "http://${ip}:${port}" > "${folder}curl-to-root-http" 2>&1
