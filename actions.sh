@@ -47,7 +47,9 @@ function isakmp-function {
                         for hash in $(seq 1 6);do 
                                 for auth in $(seq 1 8);do 
                                         for group in $(seq 1 32);do 
-                                                ike-scan ${ip} --dport=${port} >> ${folder}/ike--scan-brute 2>&1; 
+						ikeconf="${enc},${hash},${auth},${group}"
+      						echo "Following for settings: $ikeconf" >> ${folder}/ike-scan-brute
+                                                ike-scan ${ip} --dport=${port} --trans=${ikeconf} >> ${folder}/ike-scan-brute 2>&1; 
                                         done
                                 done
                         done
