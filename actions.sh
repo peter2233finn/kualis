@@ -37,6 +37,24 @@ function http-function {
 	timeout 1900 nikto -port ${port} -Tuning 01234abcx57896 -host http://${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
 }
 
+function isakmp-function {
+        ip=$1; port=$2; folder=$3
+        ike-scan ${ip} --dport ${port} -N -A > ${folder}/ike-scan 2>&1
+
+        # Brute force IKE
+        if [ ! -z "$(grep '0 returned handshake' "${folder}/ike-scan" |grep '1 returned notify')" ] && $brute; then
+                for enc in $(seq 1 9); do 
+                        for hash in $(seq 1 6);do 
+                                for auth in $(seq 1 8);do 
+                                        for group in $(seq 1 32);do 
+                                                ike-scan ${ip} --dport=${port} >> ${folder}/ike--scan-brute 2>&1; 
+                                        done
+                                done
+                        done
+                done
+        fi
+}
+
 
 function telnet-function {
 	ip=$1; port=$2; folder=$3
