@@ -34,7 +34,7 @@ function http-function {
 	curl -v "http://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	timeout 1900 gobuster dir -k -u http://${ip}:${port} -w /usr/share/dirb/wordlists/common.txt -b ${blacklist} -o "${folder}gobuster" 2> /dev/null > /dev/null
-	timeout 1900 nikto -port ${port} -Tuning 01234abcx57896 -host http://${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
+	timeout 1900 nikto -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
 }
 
 function isakmp-function {
@@ -79,7 +79,7 @@ function https-function {
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	
 	timeout 1900 gobuster dir -k -u https://${ip}:${port} -b ${blacklist} -w /usr/share/dirb/wordlists/common.txt -o "${folder}gobuster" 2> /dev/null > /dev/null
-	timeout 1900 nikto -port ${port} -Tuning 01234abcx57896 -host https://${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
+	timeout 1900 nikto -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
 	
 }
 
