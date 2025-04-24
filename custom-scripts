@@ -14,6 +14,7 @@ ms-sql-s:               null    mssql-function          XXIPXX  XXPORTXX        
 microsoft-ds:           null    microsoft-ds-function   XXIPXX  XXPORTXX        XXFOLDERXX
 netbios-ssn:            null    netbios-function        XXIPXX  XXPORTXX        XXFOLDERXX
 msrpc:                  null    rpc-function            XXIPXX  XXPORTXX        XXFOLDERXX
+grpc:                   null    rpc-function            XXIPXX  XXPORTXX        XXFOLDERXX
 unmatch:                null    unknown-function        XXIPXX  XXPORTXX        XXFOLDERXX
 telnet:                 null    telnet-function         XXIPXX  XXPORTXX        XXFOLDERXX
 mysql:                  null    mysql-function          XXIPXX  XXPORTXX        XXFOLDERXX
