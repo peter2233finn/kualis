@@ -1,48 +1,49 @@
 bgp:                    bgp-nmap-scripts        nmap -sV -sC XXIPXX -p XXPORTXX --script="*asn*" -Pn
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX 2>&1
-isakmp?:                ike-scan                ike-scan XXIPXX --dport XXPORTXX -N -A > XXFILEXX 2>&1
 ldap:                   ldap-nmap-script        nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn > XXFILEXX
 ldap:                   ldapsearch              ldapsearch -H ldaps://XXIPXX:XXPORTXX/ -x -s base -b '' "(objectClass=*)" "*" + > XXFILEXX 2>&1
 ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 sip:                    nmap-sip-scripts        nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
 
-ms-sql-m:               null			              ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ms-sql-m:               null			              mssql-function          XXIPXX XXPORTXX XXFOLDERXX
-ms-sql-s:               null			              ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ms-sql-s:               null              			mssql-function          XXIPXX XXPORTXX XXFOLDERXX
-microsoft-ds:           null                    microsoft-ds-function   XXIPXX XXPORTXX XXFOLDERXX
-netbios-ssn:            null                    netbios-function        XXIPXX XXPORTXX XXFOLDERXX
-msrpc:                  null                    rpc-function            XXIPXX XXPORTXX XXFOLDERXX
-unmatch:                null                    unknown-function        XXIPXX XXPORTXX XXFOLDERXX
-telnet:                 null                    telnet-function         XXIPXX XXPORTXX XXFOLDERXX
-mysql:                  null                    mysql-function          XXIPXX XXPORTXX XXFOLDERXX
-smtp:                   null                    smtp-function           XXIPXX XXPORTXX XXFOLDERXX
-snmp:                   null                    snmp-function           XXIPXX XXPORTXX XXFOLDERXX
-http-alt:               null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
-http:                   null                    http-function           XXIPXX XXPORTXX XXFOLDERXX
-http-proxy:		          null                    http-function		        XXIPXX XXPORTXX XXFOLDERXX
-http-rpc-epmap:		      null              			http-function		        XXIPXX XXPORTXX XXFOLDERXX
-ssh:                    null                    ssh-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/ms-wbt-server:      null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/ms-wbt-server:      null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/tram:               null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/unknown             null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ms-wbt-server:          null                    rdp-function            XXIPXX XXPORTXX XXFOLDERXX
-https:                  null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
-https:                  null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-https-proxy             null                   	http-function           XXIPXX XXPORTXX XXFOLDERXX
-https-proxy             null                   	ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-https-proxy             null                   	http-proxy-function     XXIPXX XXPORTXX XXFOLDERXX
-ssl/https:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
-ssl/https:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/https-alt:          null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
-ssl/https-alt:          null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/http:               null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
-ssl/http:               null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/coldfusion-auth:    null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-https-alt:              null                    https-function          XXIPXX XXPORTXX XXFOLDERXX
-https-alt:              null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/sun-sr-https:       null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ssl/dlip                null                    ssl-function            XXIPXX XXPORTXX XXFOLDERXX
-ftp:                    null                    ftp-function            XXIPXX XXPORTXX XXFOLDERXX
+isakmp:                 null    isakmp-function         XXIPXX  XXPORTXX        XXFOLDERXX
+ms-sql-m:               null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ms-sql-m:               null    mssql-function          XXIPXX  XXPORTXX        XXFOLDERXX
+ms-sql-s:               null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ms-sql-s:               null    mssql-function          XXIPXX  XXPORTXX        XXFOLDERXX
+microsoft-ds:           null    microsoft-ds-function   XXIPXX  XXPORTXX        XXFOLDERXX
+netbios-ssn:            null    netbios-function        XXIPXX  XXPORTXX        XXFOLDERXX
+msrpc:                  null    rpc-function            XXIPXX  XXPORTXX        XXFOLDERXX
+unmatch:                null    unknown-function        XXIPXX  XXPORTXX        XXFOLDERXX
+telnet:                 null    telnet-function         XXIPXX  XXPORTXX        XXFOLDERXX
+mysql:                  null    mysql-function          XXIPXX  XXPORTXX        XXFOLDERXX
+smtp:                   null    smtp-function           XXIPXX  XXPORTXX        XXFOLDERXX
+snmp:                   null    snmp-function           XXIPXX  XXPORTXX        XXFOLDERXX
+http-alt:               null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
+http:                   null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
+http-proxy:             null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
+http-rpc-epmap:         null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
+ssh:                    null    ssh-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/ms-wbt-server:      null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/ms-wbt-server:      null    rdp-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/tram:               null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/vop:                null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/unknown:            null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ms-wbt-server:          null    rdp-function            XXIPXX  XXPORTXX        XXFOLDERXX
+https:                  null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+https:                  null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+https-proxy:            null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
+https-proxy:            null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+https-proxy:            null    http-proxy-function     XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/https:              null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/https:              null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/https-alt:          null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/https-alt:          null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/http:               null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/http:               null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/coldfusion-auth:    null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+https-alt:              null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+https-alt:              null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/sun-sr-https:       null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/dlip:               null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ftp:                    null    ftp-function            XXIPXX  XXPORTXX        XXFOLDERXX
