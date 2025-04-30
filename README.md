@@ -33,4 +33,6 @@ To run the scan, use the command ./scan.sh -a actions.sh -c custom-scripts -f (s
 <br>**./scan.sh -o outputFolder -f scanResults.txt -c custom-scripts -a actions.sh -t 1**
 <br><br>
 
+Once the scan is complete, the function vulnfinder.sh can be run. This basically greps issues and then prints them. Its not great and needs improvement but it can find basic issues.
+
 Feel free to commit changes and additions. Im not a programmer by day, so please excuse the not-good code. Also, i know its bloated and inefficent.
