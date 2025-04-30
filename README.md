@@ -22,7 +22,7 @@ the tool will run tools such as nikto, sslscan, gobuster ect. The tools that wil
 
 4. This will call the relivant command or function in the file called actions.sh. Each file in actions.sh will take three arguments: ip, port and folder (in that order).
 
-To run the scan, use the command ./scan.sh -a actions.sh -c custom-scripts -f (scope file) -o (output directory) 
+To run the scan, use the command ./scan.sh -a actions.sh -c custom-scripts -f (scope file) -o (output directory) -t (threads)
 
 **To create the scope document**
 <br>The first part of the file can be created using a scanner such as Nessus, Nmap or Masscan. 
