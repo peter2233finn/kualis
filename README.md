@@ -1,6 +1,6 @@
 # A bash script designed to streamline penetration testing by automatically running tools on a given service. 
 This script that will take in a previous TCP/UDP scan, and run a selection of tools depending on what service is detected by an Nmap scan. It will then create a directory tree of IP/port/scan-results.
-For example:
+<br><br>For example:
 <br> scan-output/10.10.10.4/443/nmap
 <br> scan-output/10.10.10.4/443/gobuster
 <br> scan-output/10.10.10.4/443/sslscan
