@@ -20,6 +20,8 @@ the tool will run tools such as nikto, sslscan, gobuster ect. The tools that wil
 
 3. The third and final part of the file contains the command or function in actions.sh. The XXPORTXX, XXIPXX and XXFOLDERXX will be replaced with the IP address, port number and folder to be used.
 
+4. This will call the relivant command or function in the file called actions.sh. Each file in actions.sh will take three arguments: ip, port and folder (in that order).
+
 To run the scan, use the command ./scan.sh -a actions.sh -c custom-scripts -f (scope file) -o (output directory) 
 
 **To create the scope document**
