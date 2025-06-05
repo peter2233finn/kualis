@@ -34,22 +34,26 @@ function http-function {
 	curl -v "http://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	timeout 1900 gobuster dir -k -u http://${ip}:${port} -w /usr/share/dirb/wordlists/common.txt -b ${blacklist} -o "${folder}gobuster" 2> /dev/null > /dev/null
-	timeout 1900 nikto -nossl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
+	timeout 1900 nikto -nolookup -nossl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests > "${folder}nikto" 2>&1
 }
 
 function isakmp-function {
         ip=$1; port=$2; folder=$3
-        ike-scan ${ip} --dport ${port} -N -A > ${folder}/ike-scan 2>&1
+        ike-scan --sport 0 ${ip} --dport ${port} -N -A > ${folder}/ike-scan 2>&1
 
         # Brute force IKE
-        if [ ! -z "$(grep '0 returned handshake' "${folder}/ike-scan" |grep '1 returned notify')" ] && $brute; then
+	
+	# Wait until port 500 is available?
+	# waiter=true;while $waiter; do if [ -z "$(netstat -antpu 2>/dev/null|grep "0.0.0.0:500")" ]; then waiter=false;fi;sleep 1; done
+	
+	if [ ! -z "$(grep '0 returned handshake' "${folder}/ike-scan" |grep '1 returned notify')" ] && $brute; then
                 for enc in $(seq 1 9); do 
                         for hash in $(seq 1 6);do 
                                 for auth in $(seq 1 8);do 
                                         for group in $(seq 1 32);do 
 						ikeconf="${enc},${hash},${auth},${group}"
       						echo "Following for settings: $ikeconf" >> ${folder}/ike-scan-brute
-                                                ike-scan ${ip} --dport=${port} --trans=${ikeconf} >> ${folder}/ike-scan-brute 2>&1; 
+                                                ike-scan --sport 0 ${ip} --dport=${port} --trans=${ikeconf} >> ${folder}/ike-scan-brute 2>&1; 
                                         done
                                 done
                         done
@@ -78,8 +82,8 @@ function https-function {
 	curl --insecure -v "https://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	
-	timeout 1900 gobuster dir -k -u https://${ip}:${port} -b ${blacklist} -w /usr/share/dirb/wordlists/common.txt -o "${folder}gobuster" 2> /dev/null > /dev/null
-	timeout 1900 nikto -ssl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests 2>&1 > "${folder}nikto"
+	timeout 1900 gobuster dir -k -u https://${ip}:${port} -b ${blacklist} -w /usr/share/dirb/wordlists/common.txt > "${folder}gobuster" 2>&1
+	timeout 1900 nikto -nolookup -ssl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests > "${folder}nikto" 2>&1
 	
 }
 
