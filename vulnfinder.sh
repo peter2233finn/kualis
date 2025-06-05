@@ -57,13 +57,15 @@ regexFind  "HIGH: Weak ciphers are in use. RC4/3DES" "3DES|RC4" "sslscan"
 simpleFind "HIGH: Plaintext Protocol: FTP is enabled" "open"  "ftp" "ftp-nmap-scripts"
 simpleFind "HIGH: Plaintext Protocol: Telnet is enabled" "open"  "telnet" "telnet-nmap-scripts"
 simpleFind "HIGH: Plaintext Protocol: The server accepts HTTP connections with code 200. may not redirect to HTTPS supported port" "200 OK" "curl-to-root-http"
+simpleFind "HIGH: IKE Handshake Discovered as 3DES:" "Handshake returned" "3DES" "ike-scan"
+simpleFind "HIGH: IKE Handshake Discovered. This can be brute-forced offline" "Handshake returned" "ike-scan"
 
 regexFind  "MEDIUM: The SSH server is using weak algorythms/hashes/mac" "algorithm to remove|\[fail\]" "ssh-audit"
 simpleFind "MEDIUM: No SCSV Fallback in use " "Server does not support TLS Fallback SCSV" "sslscan"
 simpleFind "MEDIUM: SSL/TLS - TLSv1.0 is enabled." "TLSv1.0" "enabled" "sslscan"
 simpleFind "MEDIUM: SMB message signing not required." "Message signing enabled but not required" "smb-nmap-scripts"
 
-
+simpleFind "LOW: Risky HTTP methods" "Potentially risky methods" "nmap"
 simpleFind "LOW: Trace method allowed" "Access-Control-Allow-Methods" "curl-to-root"
 simpleFind "LOW: SSL/TLS - TLSv1.1 is enabled." "TLSv1.1" "enabled" "sslscan"
 
