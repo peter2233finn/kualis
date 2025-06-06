@@ -5,6 +5,9 @@ ldap:                   ldapsearch              ldapsearch -H ldaps://XXIPXX:XXP
 ndmp:                   ndmp-nmap-scripts       nmap -n -sV --script "ndmp*" XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 omginitialrefs:         omg-nmap-scan           nmap -sV -sC XXIPXX -p XXPORTXX -Pn  > XXFILEXX
 sip:                    nmap-sip-scripts        nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
+sip-tls:                nmap-sip-scripts        nmap XXIPXX -p XXPORTXX --script="sip*" -Pn  > XXFILEXX
+pptp:	                nmap-pptp-scripts       nmap XXIPXX -p XXPORTXX --script="pptp* -pn  > XXFILEXX
+
 
 isakmp:                 null    isakmp-function         XXIPXX  XXPORTXX        XXFOLDERXX
 ms-sql-m:               null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
@@ -14,6 +17,7 @@ ms-sql-s:               null    mssql-function          XXIPXX  XXPORTXX        
 microsoft-ds:           null    microsoft-ds-function   XXIPXX  XXPORTXX        XXFOLDERXX
 netbios-ssn:            null    netbios-function        XXIPXX  XXPORTXX        XXFOLDERXX
 msrpc:                  null    rpc-function            XXIPXX  XXPORTXX        XXFOLDERXX
+vnc:                    null    vnc-function            XXIPXX  XXPORTXX        XXFOLDERXX
 grpc:                   null    rpc-function            XXIPXX  XXPORTXX        XXFOLDERXX
 unmatch:                null    unknown-function        XXIPXX  XXPORTXX        XXFOLDERXX
 telnet:                 null    telnet-function         XXIPXX  XXPORTXX        XXFOLDERXX
@@ -30,6 +34,7 @@ ssl/ms-wbt-server:      null    rdp-function            XXIPXX  XXPORTXX        
 ssl/tram:               null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
 ssl/vop:                null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
 ssl/unknown:            null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
+ssl/unknown:            null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
 ms-wbt-server:          null    rdp-function            XXIPXX  XXPORTXX        XXFOLDERXX
 https:                  null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
 https:                  null    ssl-function            XXIPXX  XXPORTXX        XXFOLDERXX
