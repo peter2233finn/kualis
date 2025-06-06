@@ -28,6 +28,13 @@ function http-proxy-function {
 	done > ${folder}/http-proxy-to-addresses 2>&1
 }
 
+function ntp-function {
+	ip=$1; port=$2; folder=$3
+	ntpq -c rv ${ip} > ${folder}/ntpq-lookup
+	nmap --script="ntp*" ${ip} -p ${port} -sV > ${folder}/ntpq-lookup
+
+}
+
 function http-function {
 	ip=$1; port=$2; folder=$3
 	curl -v "http://${ip}:${port}" > "${folder}curl-to-root-http" 2>&1
@@ -46,7 +53,7 @@ function isakmp-function {
 	# Wait until port 500 is available?
 	# waiter=true;while $waiter; do if [ -z "$(netstat -antpu 2>/dev/null|grep "0.0.0.0:500")" ]; then waiter=false;fi;sleep 1; done
 	
-	if [ ! -z "$(grep '0 returned handshake' "${folder}/ike-scan" |grep '1 returned notify')" ] && $brute; then
+	if [ ! -z "$(grep '0 returned handshake' "${folder}/ike-scan")" ] && $brute; then
                 for enc in $(seq 1 9); do 
                         for hash in $(seq 1 6);do 
                                 for auth in $(seq 1 8);do 
@@ -151,10 +158,16 @@ function microsoft-ds-function {
 }
 
 
+function vnc-function {
+	ip=$1; port=$2; folder=$3
+	nmap -sV -sC -Pn ${ip} -p ${port} --script="*vnc* and not brute" > ${folder}vnc-nmap-scripts 2>&1
+	[ $brute = true ] && nmap -sV -sC -Pn ${ip} -p ${port} --script="vnc-brute" > ${folder}vnc-nmap-brute 2> /dev/null
+}
+
 function ftp-function {
 	ip=$1; port=$2; folder=$3
 	nmap -sV -sC -Pn ${ip} -p ${port} --script="*ftp* and not brute" > ${folder}ftp-nmap-scripts 2>&1
-	[ $brute = true ] && nmap -sV -sC -Pn ${ip} -p ${port} --script="ftp-brute" > ${folder}ftp-nmap-scripts 2> /dev/null
+	[ $brute = true ] && nmap -sV -sC -Pn ${ip} -p ${port} --script="ftp-brute" > ${folder}ftp-nmap-brute 2> /dev/null
 }
 
 function dns-function {
