@@ -10,19 +10,37 @@ if [ "$(id -u)" -ne 0 ]; then
 fi                            
 quick="false"                                                                                                                                                                                                                            
 export brute="false"
-# Put user args into varables                                                                                                                                                                                                              
-while getopts qa:o:f:c:t:b opts; do                                                                                                                                                                                                          
+export jumpbox="false"
+# Put user args into varables 
+                          
+# h - jb host
+# u - jb user
+# p - jp port
+# i - jb identity file
+while getopts jqa:o:f:c:h:u:p:i:t:b opts; do                                                                                                                                                                                                          
         case ${opts} in                                                                                                                                                                                                                    
                 a) functionScript="${OPTARG}" ;;                                                                                                                                                                                           
                 f) target="${OPTARG}" ;;                                                                                                                                                                                                   
                 o) folder="${OPTARG}" ;;                                                                                                                                                                                                   
                 c) customscripts="${OPTARG}" ;;                                                                                                                                                                                            
                 t) forks="${OPTARG}" ;;                                                                                                                                                                                                    
+                h) export jbhost="${OPTARG}" ;;                                                                                                                                                                                                    
+                u) export jbuser="${OPTARG}" ;;                                                                                                                                                                                                    
+                p) export jbport="${OPTARG}" ;;                                                                                                                                                                                                    
+                i) export jbidentity="${OPTARG}" ;;                                                                                                                                                                                                    
                 q) quick="true" ;;                                                                                                                                                                                                    
+                j) export jumpbox="true" ;;                                                                                                                                                                                                    
                 b) export brute="true" ;;                                                                                                                                                                                                    
         esac                                                                                                                                                                                                                               
 done                                                                                                                                                                                                                          
  
+if [ "$jumpbox" = "true" ]; then
+	[ -z $jbuser ] && echo "for JumpBox, you must specify the user with -u" && exit
+	[ -z $jbidentity ] && echo "for JumpBox, you must specify the ssh private key with -i" && exit
+	[ -z $jbhost ] && echo "for JumpBox, you must specify the host with -h" && exit
+	[ -z $jbport ] && echo "for JumpBox, you must specify the port with -p. The default should be 22." && exit
+	echo "Attempting SSH connection with the command: ssh ${jbuser}@${jbhost} -p ${jbport} -i ${jbidentity}"
+fi
 
 if [ "$quick" = "true" ]; then
 	functionScript="actions.sh"                                                                                                                                                                                           
@@ -35,14 +53,14 @@ fi
 if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ] || [ -z "$functionScript" ]; then                                                                                                                                      
 	echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file) -a (functions script - this is the actions.sh file) -t (threads - how many hosts to scan at once"
 	echo
-	echo "on quick mode: kualys -q -o (output) -f (list of targets in the format: IP Port Protocol)"                                                                                                                                                                                                                                         
+	echo "on quick (-q) mode: kualys -q -o (output) -f (list of targets in the format: IP Port Protocol)"                                                                                                                                                                                                                                         
         exit                                                                                                                                                                                                                               
 fi                                                                                                                                                                                                                                         
                                                                                                                                                                                                                                            
 # set the number of processes to 3 if not set by user                                                                                                                                                                                      
 [ -z "$forks" ] && forks=3                                                                                                                                                                                                                 
  
-echo "Using $forks threads. Brute force: $brute"
+echo "Using $forks threads. Brute force: $brute. SSH JumpBox: $jumpbox"
 
 # Ensure directory exists.                                                                                                                                                                                                                 
 mkdir "$folder" 2> /dev/null                                                                                                                                                                                                               
