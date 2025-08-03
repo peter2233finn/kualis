@@ -7,19 +7,22 @@
 if [ "$(id -u)" -ne 0 ]; then                                                                                                                                                                                                              
         echo 'This script must be run by root' >&2                                                                                                                                                                                         
         exit 1                                                                                                                                                                                                                             
-fi                                                                                                                                                                                                                                         
+fi                            
                                                                                                                                                                                                                                            
+export brute="false"
 # Put user args into varables                                                                                                                                                                                                              
-while getopts a:o:f:c:t: opts; do                                                                                                                                                                                                          
+while getopts a:o:f:c:t:b opts; do                                                                                                                                                                                                          
         case ${opts} in                                                                                                                                                                                                                    
                 a) functionScript="${OPTARG}" ;;                                                                                                                                                                                           
                 f) target="${OPTARG}" ;;                                                                                                                                                                                                   
                 o) folder="${OPTARG}" ;;                                                                                                                                                                                                   
                 c) customscripts="${OPTARG}" ;;                                                                                                                                                                                            
                 t) forks="${OPTARG}" ;;                                                                                                                                                                                                    
+                b) export brute="true" ;;                                                                                                                                                                                                    
         esac                                                                                                                                                                                                                               
-done                                                                                                                                                                                                                                       
-                                                                                                                                                                                                                                           
+done                                                                                                                                                                                                                          
+ 
+
 # Error checking - Ensure the correct args are set by the user                                                                                                                                                                             
 if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ] || [ -z "$functionScript" ]; then                                                                                                                                      
         echo "usage: kualys -o (output) -f (list of targets in the format: IP Port Protocol) -c (config - this is the custom-scripts file) -a (functions script - this is the actions.sh file) -t (threads - how many hosts to scan at once
