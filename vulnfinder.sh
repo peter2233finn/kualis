@@ -38,7 +38,7 @@ function regexFind () {
 	toRun="grep -R -E \"$2\" $folder"
 	for i in "$@"; do
 		if [ $lock -gt 1 ]; then
-			toRun+=" | grep -E \"$i\""
+			toRun+=" | grep -Ei \"$i\""
 		fi
 		((lock++))
 	done
@@ -59,12 +59,19 @@ simpleFind "HIGH: Plaintext Protocol: Telnet is enabled" "open"  "telnet" "telne
 simpleFind "HIGH: Plaintext Protocol: The server accepts HTTP connections with code 200. may not redirect to HTTPS supported port" "200 OK" "curl-to-root-http"
 simpleFind "HIGH: IKE Handshake Discovered as 3DES:" "Handshake returned" "3DES" "ike-scan"
 simpleFind "HIGH: IKE Handshake Discovered. This can be brute-forced offline" "Handshake returned" "ike-scan"
+simpleFind "HIGH: NTP version 4 in use. This has known vulnrabilities (Monlist amplification, buffer overflows ect)" "NTP v4" "nmap"
+simpleFind "HIGH: NTP version 3 in use. This has known vulnrabilities" "NTP v3" "nmap"
 
+
+regexFind  "MEDIUM: The SSL certificate is issued by an IP address (self-signed)" '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' "Issuer" "sslscan"
 regexFind  "MEDIUM: The SSH server is using weak algorythms/hashes/mac" "algorithm to remove|\[fail\]" "ssh-audit"
 simpleFind "MEDIUM: No SCSV Fallback in use " "Server does not support TLS Fallback SCSV" "sslscan"
 simpleFind "MEDIUM: SSL/TLS - TLSv1.0 is enabled." "TLSv1.0" "enabled" "sslscan"
 simpleFind "MEDIUM: SMB message signing not required." "Message signing enabled but not required" "smb-nmap-scripts"
+regexFind "MEDIUM: Legacy protocols are in use on the server" "open" "echo|daytime|discard|chargen" "/nmap:"
 
+regexFind "LOW: HTTP Security Headers are not present." "header is not set|header is not present.|header is not defined." "nikto"
+regexFind "LOW: Internal IP address exposed." "IP address found in the '.*' header" "nikto"
 simpleFind "LOW: Risky HTTP methods" "Potentially risky methods" "nmap"
 simpleFind "LOW: Trace method allowed" "Access-Control-Allow-Methods" "curl-to-root"
 simpleFind "LOW: SSL/TLS - TLSv1.1 is enabled." "TLSv1.1" "enabled" "sslscan"
@@ -72,4 +79,4 @@ simpleFind "LOW: SSL/TLS - TLSv1.1 is enabled." "TLSv1.1" "enabled" "sslscan"
 
 simpleFind "INFO: SSH Version detected" "OpenSSH " "nmap-ssh-no-brute" 
 simpleFind "INFO: Mssql version identification" "Product_Version:" "mssql-nmap-scripts"
-simpleFind "INFO: Server header in use" "Server: " "curl-to-root"
+regexFind "INFO: HTTP headers reveal information" "Server:|x-aspnet-version:|X-Powered-By:" "curl-to-root"
