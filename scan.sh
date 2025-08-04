@@ -34,12 +34,22 @@ while getopts jqa:o:f:c:h:u:p:i:t:b opts; do
         esac                                                                                                                                                                                                                               
 done                                                                                                                                                                                                                          
  
+
+################## START ERROR CHECKING ################## 
+
 if [ "$jumpbox" = "true" ]; then
-	[ -z $jbuser ] && echo "for JumpBox, you must specify the user with -u" && exit
-	[ -z $jbidentity ] && echo "for JumpBox, you must specify the ssh private key with -i" && exit
-	[ -z $jbhost ] && echo "for JumpBox, you must specify the host with -h" && exit
-	[ -z $jbport ] && echo "for JumpBox, you must specify the port with -p. The default should be 22." && exit
+	errorstr=""
+	e="false"
+	[ -z $jbuser ] && errorstr+="for JumpBox, you must specify the user with -u\n" && e="true"
+	[ -z $jbidentity ] &&  errorstr+="for JumpBox, you must specify the ssh private key with -i\n" && e="true"
+	[ -z $jbhost ] &&  errorstr+="for JumpBox, you must specify the host with -h\n" && e="true"
+	[ -z $jbport ] && errorstr+="for JumpBox, you must specify the port with -p The default should be 22.\n" && e="true"
+	[ $e ] && printf "$errorstr" && exit
 	echo "Attempting SSH connection with the command: ssh ${jbuser}@${jbhost} -p ${jbport} -i ${jbidentity}"
+	
+	ssh "${jbuser}"@"${jbhost}" -p "${jbport}" -i "${jbidentity}" &
+	sleep 5
+	[ $? -ne 0 ] && (echo "There was a problem connecting to the jumpbox. Please ensure SSH is working with a public key."; exit)
 fi
 
 if [ "$quick" = "true" ]; then
@@ -56,7 +66,9 @@ if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ] || [ -z "$fu
 	echo "on quick (-q) mode: kualys -q -o (output) -f (list of targets in the format: IP Port Protocol)"                                                                                                                                                                                                                                         
         exit                                                                                                                                                                                                                               
 fi                                                                                                                                                                                                                                         
-                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                          
+################## END ERROR CHECKING ################## 
+
 # set the number of processes to 3 if not set by user                                                                                                                                                                                      
 [ -z "$forks" ] && forks=3                                                                                                                                                                                                                 
  
@@ -64,7 +76,20 @@ echo "Using $forks threads. Brute force: $brute. SSH JumpBox: $jumpbox"
 
 # Ensure directory exists.                                                                                                                                                                                                                 
 mkdir "$folder" 2> /dev/null                                                                                                                                                                                                               
-                                                                                                                                                                                                                                           
+ 
+findunusedport(){
+        while true; do
+                port=$(shuf -i 1024-65000 -n 1)
+                # Get list of open ports
+
+                if [ -z "$(ss -tuln | awk 'NR>1 {print $5}' | cut -d':' -f2 | sort -n | uniq | grep -Ev '^$' | grep $port)" ]; then
+                        echo $port
+                        break
+                fi
+                sleep 1
+        done
+}
+
 # fscan scans indevigual services, after they are sorted in the following code.                                                                                                                                                            
 # fscan function takes the following parameters:                                                                                                                                                                                           
 # fscan folderPath ip port
@@ -121,6 +146,9 @@ pidNum=0
 # The following code iterates through each of the services.
 # It will ensure there is ip, port, protocol.
 
+# I think the following hard coded file is a lock, indicating when the script ends.
+# if there is an early break and file is absent, it will break loop. If still present, it will continue
+# added for early abort and can be controlled within the embedded loop within
 touch /tmp/jhsjdhieif
 while [ -f "/tmp/jhsjdhieif" ]; do
 	rm /tmp/jhsjdhieif
@@ -152,6 +180,13 @@ while [ -f "/tmp/jhsjdhieif" ]; do
 				host $ip > "${ipPath}/dns-host" 2>&1
 				whois $ip > "${ipPath}/whois" 2>&1
 			fi
+
+
+			# PUT JUMPBOX CODE HERE
+			# DO SSH FORWARDING USING findopenport
+			# SET IP TO LOOPBACK
+			# PORT TO FREE PORT
+
 
 			# Skip if the protocol is not present. 
 			# This is the final variable after ip and port, so if it is not present then skip it.  
