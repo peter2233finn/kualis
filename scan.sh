@@ -151,12 +151,13 @@ pidNum=0
 # The following code iterates through each of the services.
 # It will ensure there is ip, port, protocol.
 
-# I think the following hard coded file is a lock, indicating when the script ends.
+# I think the following file is a lock, indicating when the script ends.
 # if there is an early break and file is absent, it will break loop. If still present, it will continue
 # added for early abort and can be controlled within the embedded loop within
-touch /tmp/jhsjdhieif
-while [ -f "/tmp/jhsjdhieif" ]; do
-	rm /tmp/jhsjdhieif
+kualysLock="/tmp/$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 16)"
+touch $kualysLock
+while [ -f "$kualysLock" ]; do
+	rm $kualysLock
 	cat "$target" | sort | uniq | grep -Ei --color=never "udp|tcp" | while read line; do
 		ip=$(echo "$line" |awk '{print $1}' | xargs)
 		port=$(echo "$line" |awk '{print $2}' | xargs)
@@ -169,7 +170,7 @@ while [ -f "/tmp/jhsjdhieif" ]; do
 		# 192.168.1.1 will turn into 92.168.1.1 for some reason after a number of forks
 		# Spent hours on the problem and cant figure the fucking thing out. 
 		# Had incedent where scanning and bruting out-of-scope IPs
-		if [ -z "$(grep -E "^$ip" "$target" )" ]; then touch /tmp/jhsjdhieif; break; fi
+		if [ -z "$(grep -E "^$ip" "$target" )" ]; then touch "$kualysLock"; break; fi
 		
 		mkdir "${ipPath}" 2> /dev/null
 		mkdir "${folderPath}" 2> /dev/null
@@ -238,14 +239,14 @@ while [ -f "/tmp/jhsjdhieif" ]; do
 
 	# check if all hosts are scanned.
 	# Exit once they are.
-	rm /tmp/jhsjdhieif
+	rm "$kualysLock"
 	cat "$target" | sort | uniq | grep -Ei --color=never "udp|tcp" | while read line; do
 		ip=$(echo "$line" |awk '{print $1}' | xargs)
 		port=$(echo "$line" |awk '{print $2}' | xargs)
 		nmapPath="${folder}/${ip}/${port}/nmap"
 		if [ ! -f "$nmapPath" ]; then 
 			echo "Rescanning $nmapPath"
-			touch /tmp/jhsjdhieif
+			touch "$kualysLock"
 			break
 		fi
 		
