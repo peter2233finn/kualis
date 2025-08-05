@@ -44,12 +44,13 @@ if [ "$jumpbox" = "true" ]; then
 	[ -z $jbidentity ] &&  errorstr+="for JumpBox, you must specify the ssh private key with -i\n" && e="true"
 	[ -z $jbhost ] &&  errorstr+="for JumpBox, you must specify the host with -h\n" && e="true"
 	[ -z $jbport ] && errorstr+="for JumpBox, you must specify the port with -p The default should be 22.\n" && e="true"
-	[ $e ] && printf "$errorstr" && exit
-	echo "Attempting SSH connection with the command: ssh ${jbuser}@${jbhost} -p ${jbport} -i ${jbidentity}"
-	
-	ssh "${jbuser}"@"${jbhost}" -p "${jbport}" -i "${jbidentity}" &
-	sleep 5
-	[ $? -ne 0 ] && (echo "There was a problem connecting to the jumpbox. Please ensure SSH is working with a public key."; exit)
+	[ -z "$e" ] && printf "$errorstr" && exit
+	echo "Attempting SSH connection with the command: \"ssh ${jbuser}@${jbhost} -p ${jbport} -i ${jbidentity}\""
+	ssh -o ConnectTimeout=10 -q "${jbuser}"@"${jbhost}" -p "${jbport}" -i "${jbidentity}" exit
+	connStatus=$?
+
+	[ $connStatus -ne 0 ] &&  echo "There was a problem connecting to the jumpbox. Please ensure SSH is working with the public key. This key should not have a password." && exit
+	[ $connStatus -eq 0 ] && (echo "Connection successful.")
 fi
 
 if [ "$quick" = "true" ]; then
@@ -94,6 +95,7 @@ findunusedport(){
 # fscan function takes the following parameters:                                                                                                                                                                                           
 # fscan folderPath ip port
 fscan(){
+        local sshPID=$4
         local fport="$3"
         local fip="$2"
         local tmpFile="/tmp/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 33 ; echo '').pScan"
@@ -138,6 +140,9 @@ fscan(){
         cat "$tmpFileCommand"
         chmod +x "$tmpFileCommand"
         "$tmpFileCommand"
+
+ 	# kill the sshPID if necessary
+        [ "$jumpbox" = "true" ] && kill -9 $sshPID 
 }
 
 declare -a PID=()
@@ -182,10 +187,17 @@ while [ -f "/tmp/jhsjdhieif" ]; do
 			fi
 
 
-			# PUT JUMPBOX CODE HERE
-			# DO SSH FORWARDING USING findopenport
-			# SET IP TO LOOPBACK
-			# PORT TO FREE PORT
+			if [ "$jumpbox" = "true" ]; then
+				localPort=$(findunusedport)
+				ssh "${jbuser}"@"${jbhost}" -p "${jbport}" -i "${jbidentity}" -L ${localPort}:${ip}:${port} -N &
+				sshPID=$!
+				sleep 3
+
+				# SET IP TO LOOPBACK
+				# PORT TO FREE PORT
+				ip="127.0.0.1"
+				port="$localPort"
+			fi
 
 
 			# Skip if the protocol is not present. 
@@ -207,7 +219,7 @@ while [ -f "/tmp/jhsjdhieif" ]; do
 
 				
 				# FSCAN IS FORKED HERE
-				fscan "${folderPath}" "$ip" "$port" &
+				fscan "${folderPath}" "$ip" "$port" $sshPID &
 				PID+=$!
 				unset ip port proto folderPath ipPath 
 				if [ $(( $pidNum % $forks )) -eq 0 ]; then
@@ -224,7 +236,7 @@ while [ -f "/tmp/jhsjdhieif" ]; do
 		fi
 	done
 
-	# chack if all hosts are scanned.
+	# check if all hosts are scanned.
 	# Exit once they are.
 	rm /tmp/jhsjdhieif
 	cat "$target" | sort | uniq | grep -Ei --color=never "udp|tcp" | while read line; do
