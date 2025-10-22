@@ -109,7 +109,14 @@ fscan(){
 
 
         # Create file with the commands to be run. Alter parameters using sed.
-        grep -E "^${service}:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" > $tmpFile
+	touch $tmpFile
+
+	# This will split the services. Eg ssl/https will call ssl and https seperatly. 
+	# This is done as there are too many services that call ssl/service unaccounted for.
+	for splitService in $(echo $service | tr '/' ' '); do 
+		echo "TRACKING: $splitService"
+		grep -E "^${splitService}:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" >> $tmpFile
+	done
 
         # Print to user the commands that will be run.
         if [ $(wc -l $tmpFile | awk '{print $1}') -eq 0 ]; then
