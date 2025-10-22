@@ -1,7 +1,7 @@
 # This will split services. Ef ssl/https will call ssl and https.
-# Some ssl finctions added manually as nmap will not call ssl/service before they are called.
+# Some ssl functions added manually as nmap will not call ssl/service before they are called.
 
-# for the xxfilexx, this is in the format: (nmap call) (file name to put it into) (command))
+# for the xxfilexx, this is in the format: (nmap call) (file name to put it into) (command)
 bgp:                    bgp-nmap-scripts        nmap -sV -sC XXIPXX -p XXPORTXX --script="*asn*" -Pn
 fw1-secureremote:       Banner-grabbed          printf '\x51\x00\x00\x00\x00\x00\x00\x21\x00\x00\x00\x0bsecuremote\x00' | timeout 3 nc -w 1 XXIPXX XXPORTXX > XXFILEXX 2>&1
 ldap:                   ldap-nmap-script        nmap XXIPXX -p XXPORTXX --script="*ldap*" -Pn > XXFILEXX
@@ -44,14 +44,14 @@ http:                   null    http-function           XXIPXX  XXPORTXX        
 http-proxy:             null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
 http-rpc-epmap:         null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
 ssh:                    null    ssh-function            XXIPXX  XXPORTXX        XXFOLDERXX
-ssl/ms-wbt-server:      null    rdp-function            XXIPXX  XXPORTXX        XXFOLDERXX
-ssl/unknown:            null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+ms-wbt-server:          null    rdp-function            XXIPXX  XXPORTXX        XXFOLDERXX
+unknown:                null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
 ms-wbt-server:          null    rdp-function            XXIPXX  XXPORTXX        XXFOLDERXX
 https:                  null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
 https-proxy:            null    http-function           XXIPXX  XXPORTXX        XXFOLDERXX
 https-proxy:            null    http-proxy-function     XXIPXX  XXPORTXX        XXFOLDERXX
-ssl/https:              null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
-ssl/https-alt:          null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
-ssl/http:               null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+https:                  null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+https-alt:              null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
+http:                   null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
 https-alt:              null    https-function          XXIPXX  XXPORTXX        XXFOLDERXX
 ftp:                    null    ftp-function            XXIPXX  XXPORTXX        XXFOLDERXX
