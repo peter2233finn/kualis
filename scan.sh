@@ -113,10 +113,15 @@ fscan(){
 
 	# This will split the services. Eg ssl/https will call ssl and https seperatly. 
 	# This is done as there are too many services that call ssl/service unaccounted for.
-	for splitService in $(echo $service | tr '/' ' '); do 
+	
+	# varible blacklistService is a regex of services that should not be split. Eg ssl/http is https.
+	blacklistService="ssl/http"
+
+	for splitService in $(echo $service | grep -Ev "${blacklistService}" | tr '/' ' '); do 
 		echo "TRACKING: $splitService"
 		grep -E "^${splitService}:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" >> $tmpFile
 	done
+	grep -E "^${service}:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" >> $tmpFile
 
         # Print to user the commands that will be run.
         if [ $(wc -l $tmpFile | awk '{print $1}') -eq 0 ]; then
