@@ -2,6 +2,27 @@
 
 folder="$1"
 
+function notContain () {
+# This will search for phrases that ARE NOT in the file
+# useful for finding missing HTTP security headers
+
+# 1 - error message
+# 2 - file
+# 3 - missing string
+
+	rm /tmp/vulnFinder.tmp
+	find "$folder" -name "$2" | while read file; do
+		grep -riL "$3" $file >> /tmp/vulnFinder.tmp
+		
+	done
+	
+	if [ $(wc -l /tmp/vulnFinder.tmp | awk '{print $1}') -ne 0 ]; then
+		printf "\n\n$1\n"
+		cat /tmp/vulnFinder.tmp		
+	fi
+
+}
+
 function simpleFind () {
 # This is a simple find function that will use grep -R with an initial value then any other values will grep this after
 
@@ -12,6 +33,8 @@ function simpleFind () {
 	# find number of issues to grep
 	lock=0
 	toRun="grep -R \"$2\" $folder"
+	
+	
 	for i in "$@"; do
 		if [ $lock -gt 1 ]; then
 			toRun+=" | grep \"$i\""
@@ -69,6 +92,11 @@ simpleFind "MEDIUM: No SCSV Fallback in use " "Server does not support TLS Fallb
 simpleFind "MEDIUM: SSL/TLS - TLSv1.0 is enabled." "TLSv1.0" "enabled" "sslscan"
 simpleFind "MEDIUM: SMB message signing not required." "Message signing enabled but not required" "smb-nmap-scripts"
 regexFind "MEDIUM: Legacy protocols are in use on the server" "open" "echo|daytime|discard|chargen" "/nmap:"
+notContain "MEDIUM: HTTP Security header: X-Frame-Options not found" "curl-to-root" "x-frame-options"
+notContain "MEDIUM: HTTP Security header: X-Content-Type-Options not found" "curl-to-root" "X-Content-Type-Options"
+notContain "MEDIUM: HTTP Security header: X-XSS-Protection not found" "curl-to-root" "X-XSS-Protection"
+notContain "MEDIUM: HTTP Security header: Content-Security-Policy not found" "curl-to-root" "Content-Security-Policy"
+notContain "MEDIUM: HTTP Security header: Strict-Transport-Security not found" "curl-to-root" "Strict-Transport-Security"
 
 regexFind "LOW: HTTP Security Headers are not present." "header is not set|header is not present.|header is not defined." "nikto"
 regexFind "LOW: Internal IP address exposed." "IP address found in the '.*' header" "nikto"
