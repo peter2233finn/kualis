@@ -16,11 +16,12 @@ function notContain () {
 		
 	done
 	
-	if [ $(wc -l /tmp/vulnFinder.tmp | awk '{print $1}') -ne 0 ]; then
-		printf "\n\n$1\n"
-		cat /tmp/vulnFinder.tmp		
+	if [ -f /tmp/vulnFinder.tmp ]; then
+		if [ $(wc -l /tmp/vulnFinder.tmp | awk '{print $1}') -ne 0 ]; then
+			printf "\n\n$1\n"
+			cat /tmp/vulnFinder.tmp		
+		fi
 	fi
-
 }
 
 function simpleFind () {
