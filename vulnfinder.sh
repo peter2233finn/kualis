@@ -77,18 +77,18 @@ function regexFind () {
 
 simpleFind "HIGH: SSLv2 is enabled" "SSLv2" "enabled" "sslscan"
 simpleFind "HIGH: SSLv3 is enabled" "SSLv3" "enabled" "sslscan"
-regexFind  "HIGH: Weak ciphers are in use. RC4/3DES" "3DES|RC4" "sslscan"
+regexFind  "HIGH: Weak cyphers are in use. RC4/3DES" "3DES|RC4" "sslscan"
 simpleFind "HIGH: Plaintext Protocol: FTP is enabled" "open"  "ftp" "ftp-nmap-scripts"
 simpleFind "HIGH: Plaintext Protocol: Telnet is enabled" "open"  "telnet" "telnet-nmap-scripts"
 simpleFind "HIGH: Plaintext Protocol: The server accepts HTTP connections with code 200. may not redirect to HTTPS supported port" "200 OK" "curl-to-root-http"
 simpleFind "HIGH: IKE Handshake Discovered as 3DES:" "Handshake returned" "3DES" "ike-scan"
 simpleFind "HIGH: IKE Handshake Discovered. This can be brute-forced offline" "Handshake returned" "ike-scan"
-simpleFind "HIGH: NTP version 4 in use. This has known vulnrabilities (Monlist amplification, buffer overflows ect)" "NTP v4" "nmap"
-simpleFind "HIGH: NTP version 3 in use. This has known vulnrabilities" "NTP v3" "nmap"
+simpleFind "HIGH: NTP version 4 in use. This has known vulnerabilities (Monlist amplification, buffer overflows ect)" "NTP v4" "nmap"
+simpleFind "HIGH: NTP version 3 in use. This has known vulnerabilities" "NTP v3" "nmap"
 
 
 regexFind  "MEDIUM: The SSL certificate is issued by an IP address (self-signed)" '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' "Issuer" "sslscan"
-regexFind  "MEDIUM: The SSH server is using weak algorythms/hashes/mac" "algorithm to remove|\[fail\]" "ssh-audit"
+regexFind  "MEDIUM: The SSH server is using weak algorithms/hashes/mac" "algorithm to remove|\[fail\]" "ssh-audit"
 simpleFind "MEDIUM: No SCSV Fallback in use " "Server does not support TLS Fallback SCSV" "sslscan"
 simpleFind "MEDIUM: SSL/TLS - TLSv1.0 is enabled." "TLSv1.0" "enabled" "sslscan"
 simpleFind "MEDIUM: SMB message signing not required." "Message signing enabled but not required" "smb-nmap-scripts"
@@ -98,6 +98,8 @@ notContain "MEDIUM: HTTP Security header: X-Content-Type-Options not found" "cur
 notContain "MEDIUM: HTTP Security header: X-XSS-Protection not found" "curl-to-root" "X-XSS-Protection"
 notContain "MEDIUM: HTTP Security header: Content-Security-Policy not found" "curl-to-root" "Content-Security-Policy"
 notContain "MEDIUM: HTTP Security header: Strict-Transport-Security not found" "curl-to-root" "Strict-Transport-Security"
+regexFind "MEDIUM: SSH uses weak hex/key/mac." "backdoored by the|fail] using broken|algorithm to remove" "ssh-audit"
+regexFind "MEDIUM: SSH uses password authentication." "  password" "nmap-ssh-no-brute"
 
 regexFind "LOW: HTTP Security Headers are not present." "header is not set|header is not present.|header is not defined." "nikto"
 regexFind "LOW: Internal IP address exposed." "IP address found in the '.*' header" "nikto"
