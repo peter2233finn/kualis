@@ -42,6 +42,9 @@ function http-function {
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	timeout 1900 gobuster dir -k -u http://${ip}:${port} -w /usr/share/dirb/wordlists/common.txt -b ${blacklist} -o "${folder}gobuster" 2> /dev/null > /dev/null
 	timeout 1900 nikto -nolookup -nossl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests > "${folder}nikto" 2>&1
+	whatweb http://${ip}:${port} > ${folder}/whatweb
+	
+	grep -qi wordpress ${folder}/whatweb && wordpress-function "http://${ip}:${port}" "${folder}"
 }
 
 function isakmp-function {
@@ -83,15 +86,24 @@ function ssh-function {
 	[ $brute = true ] && nmap -Pn ${ip} -p ${port} -sV --script="ssh-brute"  > "${folder}nmap-ssh-brute-force"
 }
 
+function wordpress-function {
+	url="${1}"
+	folder="${2}"
+
+	wpscan ${url} > ${folder}/wpscan
+
+}
+
 function https-function {
 	ip=$1; port=$2; folder=$3
 	curl --insecure -v "https://${ip}:${port}" > "${folder}curl-to-root" 2>&1
 	curl --insecure -v "https://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
-	
+	whatweb https://${ip}:${port} > ${folder}/whatweb
 	timeout 1900 gobuster dir -k -u https://${ip}:${port} -b ${blacklist} -w /usr/share/dirb/wordlists/common.txt > "${folder}gobuster" 2>&1
 	timeout 1900 nikto -nolookup -ssl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests > "${folder}nikto" 2>&1
 	
+	grep -qi wordpress ${folder}/whatweb && wordpress-function "https://${ip}:${port}" "${folder}"
 }
 
 function ssl-function {
