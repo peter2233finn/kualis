@@ -51,6 +51,9 @@ if [ "$jumpbox" = "true" ]; then
 
 	[ $connStatus -ne 0 ] &&  echo "There was a problem connecting to the jumpbox. Please ensure SSH is working with the public key. This key should not have a password." && exit
 	[ $connStatus -eq 0 ] && (echo "Connection successful.")
+
+	# make sure finction script is working
+	bash -c "./${functionScript}" || (echo "There is a compilation error in the ${functionScript}"; exit)
 fi
 
 if [ "$quick" = "true" ]; then
@@ -67,7 +70,8 @@ if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ] || [ -z "$fu
 	echo "on quick (-q) mode: kualys -q -o (output) -f (list of targets in the format: IP Port Protocol)"                                                                                                                                                                                                                                         
         exit                                                                                                                                                                                                                               
 fi                                                                                                                                                                                                                                         
-                                                                                                                                                                                                                                          
+[ "$target" = "$folder" ] && (echo 'You cannot set the same names for the scope and output folder'; exit)
+
 ################## END ERROR CHECKING ################## 
 
 # set the number of processes to 3 if not set by user                                                                                                                                                                                      
