@@ -11,6 +11,7 @@ fi
 quick="false"                                                                                                                                                                                                                            
 export brute="false"
 export jumpbox="false"
+forks=3                                                                                                                                                                                                    
 # Put user args into varables 
                           
 # h - jb host
@@ -34,6 +35,11 @@ while getopts jqa:o:f:c:h:u:p:i:t:b opts; do
         esac                                                                                                                                                                                                                               
 done                                                                                                                                                                                                                          
  
+if [ "$quick" = "true" ]; then
+	functionScript="actions.sh"                                                                                                                                                                                           
+	customscripts="custom-scripts"                                                                                                                                                                                          
+
+fi
 
 ################## START ERROR CHECKING ################## 
 
@@ -45,23 +51,17 @@ if [ "$jumpbox" = "true" ]; then
 	[ -z $jbhost ] &&  errorstr+="for JumpBox, you must specify the host with -h\n" && e="true"
 	[ -z $jbport ] && errorstr+="for JumpBox, you must specify the port with -p The default should be 22.\n" && e="true"
 	[ -z "$e" ] && printf "$errorstr" && exit
-	echo "Attempting SSH connection with the command: \"ssh ${jbuser}@${jbhost} -p ${jbport} -i ${jbidentity}\""
-	ssh -o ConnectTimeout=10 -q "${jbuser}"@"${jbhost}" -p "${jbport}" -i "${jbidentity}" exit
+	[ "$e" = "false" ] && echo "Attempting SSH connection with the command: \"ssh ${jbuser}@${jbhost} -p ${jbport} -i ${jbidentity}\""
+	[ "$e" = "false" ] && ssh -o ConnectTimeout=10 -q "${jbuser}"@"${jbhost}" -p "${jbport}" -i "${jbidentity}" exit
 	connStatus=$?
 
-	[ $connStatus -ne 0 ] &&  echo "There was a problem connecting to the jumpbox. Please ensure SSH is working with the public key. This key should not have a password." && exit
+	[ $connStatus -ne 0 ] &&  echo "There was a problem connecting to the jumpbox. Please ensure SSH is working with the public key. This key should not have a password." && printf "$errorstr" && exit
 	[ $connStatus -eq 0 ] && (echo "Connection successful.")
 
 	# make sure finction script is working
 	bash -c "./${functionScript}" || (echo "There is a compilation error in the ${functionScript}"; exit)
 fi
 
-if [ "$quick" = "true" ]; then
-	functionScript="actions.sh"                                                                                                                                                                                           
-	customscripts="custom-scripts"                                                                                                                                                                                          
-	forks=3                                                                                                                                                                                                    
-
-fi
 
 # Error checking - Ensure the correct args are set by the user                                                                                                                                                                             
 if [ -z "$target"  ] || [ -z "$folder" ] || [ -z "$customscripts" ] || [ -z "$functionScript" ]; then                                                                                                                                      
@@ -122,7 +122,6 @@ fscan(){
 	blacklistService="ssl/http"
 
 	for splitService in $(echo $service | grep -Ev "${blacklistService}" | tr '/' ' '); do 
-		echo "TRACKING: $splitService"
 		grep -E "^${splitService}:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" >> $tmpFile
 	done
 	grep -E "^${service}:" ${customscripts} | sed "s/XXIPXX/${fip}/g" | sed "s/XXPORTXX/${fport}/g" >> $tmpFile
@@ -161,6 +160,7 @@ fscan(){
         [ "$jumpbox" = "true" ] && kill -9 $sshPID 
 }
 
+nmapArg=""
 declare -a PID=()
 pidNum=0
 
@@ -208,7 +208,7 @@ while [ -f "$kualysLock" ]; do
 				localPort=$(findunusedport)
 				ssh "${jbuser}"@"${jbhost}" -p "${jbport}" -i "${jbidentity}" -L ${localPort}:${ip}:${port} -N &
 				sshPID=$!
-				sleep 3
+				sleep 5
 
 				# SET IP TO LOOPBACK
 				# PORT TO FREE PORT
@@ -222,13 +222,15 @@ while [ -f "$kualysLock" ]; do
 			if [ ! -z $proto ]; then
 				# Sort if tcp or udp, this will determine the nmap scan.
 				# If not tcp or udp, then skip.
+
+        			[ "$jumpbox" = "true" ] && nmapArg="--version-all" 				
 				if [ "$proto" = "tcp" ]; then
 				echo "Nmap tcp scan for ip: $ip port: $port protocol: $proto";
-					nmap -Pn -sV -sC $ip -p $port >> "${folderPath}/nmap"
+					nmap $nmapArg -Pn -sV -sC $ip -p $port >> "${folderPath}/nmap"
 
 				elif [ "$proto" = "udp" ]; then
 					echo "Nmap udp scan for ip: $ip port: $port protocol: $proto";
-					nmap -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
+					nmap $nmapArg -Pn -sV -sC -sU $ip -p $port >> "${folderPath}/nmap"
 				fi
 
 				# Multithreading function
