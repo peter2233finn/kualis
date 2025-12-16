@@ -40,9 +40,9 @@ function http-function {
 	curl -v "http://${ip}:${port}" > "${folder}curl-to-root-http" 2>&1
 	curl -v "http://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
-	timeout 1900 gobuster dir -k -u http://${ip}:${port} -w /usr/share/dirb/wordlists/common.txt -b ${blacklist} -o "${folder}gobuster" 2> /dev/null > /dev/null
+	gobuster dir -k -u http://${ip}:${port} -w /usr/share/dirb/wordlists/common.txt -b ${blacklist} > "${folder}gobuster" 2> /dev/null
 	timeout 1900 nikto -nolookup -nossl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests > "${folder}nikto" 2>&1
-	whatweb http://${ip}:${port} > ${folder}/whatweb
+	timeout 200 whatweb http://${ip}:${port} > "${folder}/whatweb"
 	
 	grep -qi wordpress ${folder}/whatweb && wordpress-function "http://${ip}:${port}" "${folder}"
 }
@@ -91,6 +91,8 @@ function wordpress-function {
 	folder="${2}"
 
 	wpscan ${url} > ${folder}/wpscan
+	curl https://${url}/wp-cron.php > ${folder}/cron-curl
+	curl https://${url}/xmlrpc.php > ${folder}/xmlrpc-curl
 
 }
 
@@ -100,7 +102,7 @@ function https-function {
 	curl --insecure -v "https://${ip}:${port}/$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)" > "${folder}curl-to-random-directory" 2>&1
 	blacklist=$(cat "${folder}curl-to-random-directory" | grep '< HTTP/' | awk '{print $3}')
 	whatweb https://${ip}:${port} > ${folder}/whatweb
-	timeout 1900 gobuster dir -k -u https://${ip}:${port} -b ${blacklist} -w /usr/share/dirb/wordlists/common.txt > "${folder}gobuster" 2>&1
+	timeout 1900 gobuster dir -k -u https://${ip}:${port} -b ${blacklist} -w /usr/share/dirb/wordlists/common.txt > "${folder}gobuster" 2> /dev/null
 	timeout 1900 nikto -nolookup -ssl -port ${port} -Tuning 01234abcx57896 -host ${ip} -Plugins headers outdated httpoptions robots origin_reflection put_del_test shellshock cgi docker_registry favicon apacheusers msgs report_text content_search parked paths tests > "${folder}nikto" 2>&1
 	
 	grep -qi wordpress ${folder}/whatweb && wordpress-function "https://${ip}:${port}" "${folder}"
@@ -191,8 +193,8 @@ function dns-function {
 
 function rpc-function {
 	ip=$1; port=$2; folder=$3
-	nmap $ip -p $port -Pn --script="*rpc* and not brute" > ${folder}rpc-nmap-scripts 2>&1
-	[ $brute = true ] && nmap ${ip} -p ${port} -Pn --script="rpcap-brute"  > ${folder}rpc-brute-nmap 2>&1
+	nmap $ip -p $port -Pn -sV --script="*rpc* and not brute" > ${folder}rpc-nmap-scripts 2>&1
+	[ $brute = true ] && nmap ${ip} -p ${port} -sV -Pn --script="rpcap-brute"  > ${folder}rpc-brute-nmap 2>&1
 }
 
 function rdp-function {
